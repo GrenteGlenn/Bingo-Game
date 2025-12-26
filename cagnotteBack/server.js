@@ -24,9 +24,24 @@ io.on("connection", (socket) => {
   console.log("🟢 connecté", socket.id);
 
   socket.on("show-action", (msg) => {
-      console.log("📥 EVENT REÇU:", msg);
+    console.log("📥 EVENT REÇU depuis", socket.id, ":", msg);
 
-    io.emit("show-action", { ...msg, ts: Date.now() });
+    // Validation basique du message
+    if (!msg || !msg.type) {
+      console.error("❌ Message invalide reçu:", msg);
+      return;
+    }
+
+    // Ajouter le timestamp et broadcast à TOUS les clients (y compris l'émetteur)
+    const enrichedMsg = { ...msg, ts: Date.now() };
+
+    // Option 1: Envoyer à TOUS (y compris l'émetteur) - utile pour synchronisation
+    io.emit("show-action", enrichedMsg);
+
+    // Option 2: Envoyer seulement aux AUTRES clients (décommenter si besoin)
+    // socket.broadcast.emit("show-action", enrichedMsg);
+
+    console.log("📤 EVENT DIFFUSÉ à tous:", enrichedMsg);
   });
 
   socket.on("disconnect", () => {
