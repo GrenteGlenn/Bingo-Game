@@ -10,6 +10,8 @@ export function getSocket() {
       path: "/socket.io",
       transports: ["polling", "websocket"],
     });
+    console.log("SOCKET URL =", process.env.NEXT_PUBLIC_SOCKET_URL);
+
     socket.on("connect", () => {
       console.log("✅ socket connecté", socket?.id);
     });
