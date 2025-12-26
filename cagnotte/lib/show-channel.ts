@@ -1,16 +1,27 @@
 "use client";
 
-import { getSocket } from "./socket";
+import { useEffect, useRef } from "react";
 import { ShowMessage } from "./show";
+import { useSocket } from "@/app/providers/socket-providers";
 
 type Listener = (m: ShowMessage) => void;
 
-export function subscribe(cb: Listener) {
-  const socket = getSocket();
+export function useShowChannel(cb: Listener) {
+  const socket = useSocket();
+  const cbRef = useRef(cb);
 
-  socket.on("show-action", cb);
+  // toujours garder la dernière version du callback
+  cbRef.current = cb;
 
-  return () => {
-    socket.off("show-action", cb);
-  };
+  useEffect(() => {
+    const handler = (m: ShowMessage) => {
+      cbRef.current(m);
+    };
+
+    socket.on("show-action", handler);
+
+    return () => {
+      socket.off("show-action", handler);
+    };
+  }, [socket]);
 }

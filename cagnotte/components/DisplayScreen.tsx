@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { subscribe,  } from "@/lib/show-channel";
 import { ShowMessage } from "@/lib/show";
+import { useShowChannel } from "@/lib/show-channel";
 
 export default function DisplayScreen() {
   const [values, setValues] = useState<number[]>([]);
 
   useEffect(() => {
-    return subscribe((m: ShowMessage) => {
+    useShowChannel((m) => {
       if (m.type === "number") {
-        setValues((prev) => {
-          if (prev.includes(m.value)) return prev;
-          return [...prev, m.value];
-        });
+        setValues((prev) =>
+          prev.includes(m.value) ? prev : [...prev, m.value]
+        );
       }
 
       if (m.type === "reset-bingo") {
