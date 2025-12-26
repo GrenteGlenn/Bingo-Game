@@ -34,8 +34,6 @@ io.on("connection", (socket) => {
       });
     });
   }
-
-  // 🔁 resync cagnotte
   if (cagnotteState) {
     socket.emit("show-action", {
       ...cagnotteState,
