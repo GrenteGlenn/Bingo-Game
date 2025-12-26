@@ -1,0 +1,7 @@
+export default function HomePage() {
+  return (
+    <main className="min-h-screen flex items-center justify-center text-white bg-black">
+      <h1 className="text-4xl">Bienvenue 👋</h1>
+    </main>
+  );
+}
