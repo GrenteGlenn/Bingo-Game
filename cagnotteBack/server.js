@@ -24,6 +24,8 @@ io.on("connection", (socket) => {
   console.log("🟢 connecté", socket.id);
 
   socket.on("show-action", (msg) => {
+      console.log("📥 EVENT REÇU:", msg);
+
     io.emit("show-action", { ...msg, ts: Date.now() });
   });
 

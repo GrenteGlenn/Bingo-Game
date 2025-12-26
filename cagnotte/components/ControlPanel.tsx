@@ -137,23 +137,29 @@
 "use client";
 
 import { getSocket } from "@/lib/socket";
+import { useEffect, useRef } from "react";
 
-const socket = getSocket();
 // import { ShowMessage } from "@/types/show";
 
 
 export default function ControlPanel() {
+    const socketRef = useRef<ReturnType<typeof getSocket> | null>(null);
+
+    useEffect(() => {
+    socketRef.current = getSocket();
+  }, []);
+
   const sendNumber = (value: number) => {
-    socket.emit("show-action", { type: "number", value });
+    socketRef.current?.emit("show-action", { type: "number", value });
   };
   const resetBingo = () => {
-    socket.emit("show-action", { type: "reset-bingo" });
+    socketRef.current?.emit("show-action", { type: "reset-bingo" });
   };
   const sendPalier = (level: 1 | 2 | 3) => {
-    socket.emit("show-action", { type: "palier", level });
+    socketRef.current?.emit("show-action", { type: "palier", level });
   };
   const feliciter = () => {
-    socket.emit("show-action", { type: "felicitation" });
+    socketRef.current?.emit("show-action", { type: "felicitation" });
   };
   return (
     <div className="p-4 flex flex-col gap-4">
