@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { subscribe, ShowMessage } from "@/lib/show-channel";
+import { subscribe,  } from "@/lib/show-channel";
+import { ShowMessage } from "@/lib/show";
 
 export default function DisplayScreen() {
   const [values, setValues] = useState<number[]>([]);
