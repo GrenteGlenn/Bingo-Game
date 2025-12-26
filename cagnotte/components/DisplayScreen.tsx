@@ -1,55 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ShowMessage } from "@/lib/show";
+import { useState } from "react";
 import { useShowChannel } from "@/lib/show-channel";
 
 export default function DisplayScreen() {
   const [values, setValues] = useState<number[]>([]);
 
-  useEffect(() => {
-    useShowChannel((m) => {
-      if (m.type === "number") {
-        setValues((prev) =>
-          prev.includes(m.value) ? prev : [...prev, m.value]
-        );
-      }
+  useShowChannel((m) => {
+    console.log("📺 DisplayScreen reçoit :", m);
 
-      if (m.type === "reset-bingo") {
-        setValues([]);
-      }
-    });
-  }, []);
+    if (m.type === "number") {
+      setValues((prev) =>
+        prev.includes(m.value) ? prev : [...prev, m.value]
+      );
+    }
+
+    if (m.type === "reset-bingo") {
+      setValues([]);
+    }
+  });
 
   return (
     <div className="w-full h-full flex items-center justify-center p-4">
-      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-10">
-        <img
-          src="/images/bingoOr.png"
-          alt=""
-          className="h-auto w-[80%] max-w-md"
-        />
-      </div>
-
       <div className="text-center w-full max-w-7xl">
         <div className="text-white text-lg md:text-3xl mt-2 mb-2">
           Numéros tirés
         </div>
 
-        <div className="grid gap-[2px] grid-cols-6 md:grid-cols-8 lg:grid-cols-10 justify-items-center">
+        <div className="grid gap-[2px] grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
           {values.map((num) => (
             <div
               key={num}
-              className="
-          w-10 h-10 md:w-14 md:h-14
-          flex items-center justify-center
-          rounded-full
-          bg-[#00A6D9]
-          text-white
-          font-black
-          text-base md:text-lg
-          shadow-md
-        "
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-[#00A6D9] text-white font-black"
             >
               {num}
             </div>

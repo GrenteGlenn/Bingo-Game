@@ -157,9 +157,9 @@ export default function ControlPanel() {
   return (
     <div className="p-4 flex flex-col gap-4">
       {" "}
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-10 gap-2">
         {" "}
-        {Array.from({ length: 25 }, (_, i) => (
+        {Array.from({ length: 50 }, (_, i) => (
           <button
             key={i}
             onClick={() => sendNumber(i + 1)}

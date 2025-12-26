@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ShowMessage, subscribe } from "@/lib/show-channel";
+import { ShowMessage } from "@/lib/show";
+import { useShowChannel } from "@/lib/show-channel";
 
 import Cagnotte3D from "@/components/cagnotte3D";
 import FireSideConfetti from "@/components/ConfettiSideCannons";
@@ -10,20 +11,19 @@ export default function Page() {
   const [lastMsg, setLastMsg] = useState<ShowMessage | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  useEffect(() => {
-    return subscribe((m: ShowMessage) => {
-      console.log("CAGNOTTE REÇU:", m);
-      setLastMsg(m);
+  // ✅ Utilisation correcte du hook au niveau racine
+  useShowChannel((m: ShowMessage) => {
+    console.log("CAGNOTTE REÇU:", m);
+    setLastMsg(m);
 
-      if (m.type === "palier" || m.type === "felicitation") {
-        setShowConfetti(true);
+    if (m.type === "palier" || m.type === "felicitation") {
+      setShowConfetti(true);
 
-        setTimeout(() => {
-          setShowConfetti(false);
-        }, 3000);
-      }
-    });
-  }, []);
+      setTimeout(() => {
+        setShowConfetti(false);
+      }, 3000);
+    }
+  });
 
   useEffect(() => {
     if (!lastMsg) return;
@@ -42,7 +42,9 @@ export default function Page() {
       <div className="absolute bottom-50 left-1/2 transform -translate-x-2/4 z-10">
         <img src="/images/voeux.png" alt="" />
       </div>
-        <span className="absolute bottom-50 left-1/2 transform -translate-x-2/4 z-10 text-white font-sans ">15/01/2026</span>
+      <span className="absolute bottom-50 left-1/2 transform -translate-x-2/4 z-10 text-white font-sans ">
+        15/01/2026
+      </span>
       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
         <img
           src="/images/RTE_logo.png"
