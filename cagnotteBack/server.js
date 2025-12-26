@@ -30,6 +30,8 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(4000, () => {
-  console.log("🚀 Socket.IO sur 4000");
+const PORT = process.env.PORT || 4000;
+
+server.listen(PORT, () => {
+  console.log(`🚀 Socket.IO listening on port ${PORT}`);
 });
