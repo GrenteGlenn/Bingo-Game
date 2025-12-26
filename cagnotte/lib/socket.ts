@@ -1,9 +1,18 @@
 "use client";
 
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL!;
+let socket: Socket | null = null;
 
-export const socket = io(SOCKET_URL, {
-  transports: ["websocket"],
-});
+export function getSocket() {
+  if (!socket) {
+    socket = io(process.env.NEXT_PUBLIC_SOCKET_URL!, {
+      transports: ["polling", "websocket"],
+    });
+    socket.on("connect", () => {
+      console.log("✅ socket connecté", socket?.id);
+    });
+  }
+
+  return socket;
+}

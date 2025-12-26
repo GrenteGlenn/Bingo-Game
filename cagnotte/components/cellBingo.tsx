@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { socket } from "@/lib/socket";
+
 import FireSideConfetti from "./ConfettiSideCannons";
+import { getSocket } from "@/lib/socket";
+
+const socket = getSocket();
 
 type CellKey = `${number}-${number}`;
 

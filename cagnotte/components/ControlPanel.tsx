@@ -136,8 +136,9 @@
 
 "use client";
 
-import { socket } from "@/lib/socket";
+import { getSocket } from "@/lib/socket";
 
+const socket = getSocket();
 // import { ShowMessage } from "@/types/show";
 
 
