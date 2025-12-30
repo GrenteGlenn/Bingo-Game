@@ -13,13 +13,11 @@ export default function Page() {
   const [score, setScore] = useState<number>(0);
 
   useShowChannel((m: ShowMessage) => {
-    // 💰 mise à jour score
     if (m.type === "cagnotte-update") {
       setScore(m.points);
-      return; // ❗ pas d’animation centrale
+      return; 
     }
 
-    // 🎯 messages visuels
     setLastMsg(m);
 
     if (m.type === "palier" || m.type === "felicitation") {
@@ -38,14 +36,15 @@ export default function Page() {
     <main className="relative w-full h-screen overflow-hidden">
       {showConfetti && <FireSideConfetti duration={3000} />}
 
-      {/* 💰 SCORE */}
-      <div className="
+      <div
+        className="
         absolute top-4 right-4 z-30
         rounded-2xl bg-black/60 backdrop-blur-md
         px-4 py-2 text-white font-black
         text-lg md:text-2xl shadow-lg
-      ">
-        💰 {score.toLocaleString()} pts
+      "
+      >
+        {score.toLocaleString()} pts
       </div>
 
       <div

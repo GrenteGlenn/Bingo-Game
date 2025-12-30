@@ -3,6 +3,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 const fs = require("fs");
+
 const STATE_FILE = "./state.json";
 
 let cagnottePoints = 0;
@@ -11,10 +12,23 @@ if (fs.existsSync(STATE_FILE)) {
   try {
     const data = JSON.parse(fs.readFileSync(STATE_FILE, "utf-8"));
     cagnottePoints = data.cagnottePoints ?? 0;
-    console.log("✅ cagnotte restaurée :", cagnottePoints);
   } catch {
-    console.log("⚠️ état cagnotte corrompu");
   }
+}
+
+
+let saveTimeout = null;
+function scheduleSave() {
+  if (saveTimeout) return;
+
+  saveTimeout = setTimeout(() => {
+    fs.writeFile(
+      STATE_FILE,
+      JSON.stringify({ cagnottePoints }, null, 2),
+      () => {}
+    );
+    saveTimeout = null;
+  }, 1000); 
 }
 
 const app = express();
@@ -53,6 +67,7 @@ io.on("connection", (socket) => {
       });
     });
   }
+
   if (cagnotteState) {
     socket.emit("show-action", {
       ...cagnotteState,
@@ -64,13 +79,27 @@ io.on("connection", (socket) => {
     if (msg.type === "add-points") {
       cagnottePoints += msg.points;
 
-      fs.writeFileSync(STATE_FILE, JSON.stringify({ cagnottePoints }, null, 2));
+      io.emit("show-action", {
+        type: "cagnotte-update",
+        points: cagnottePoints,
+        ts: Date.now(),
+      });
+
+      scheduleSave();
+      return;
+    }
+
+    if (msg.type === "reset-score") {
+      cagnottePoints = 0;
 
       io.emit("show-action", {
         type: "cagnotte-update",
         points: cagnottePoints,
         ts: Date.now(),
       });
+
+      scheduleSave();
+      return;
     }
 
     if (msg.type === "number") {
@@ -87,17 +116,6 @@ io.on("connection", (socket) => {
     if (msg.type === "palier" || msg.type === "felicitation") {
       cagnotteState = msg;
     }
-    if (msg.type === "reset-score") {
-      cagnottePoints = 0;
-
-      fs.writeFileSync(STATE_FILE, JSON.stringify({ cagnottePoints }, null, 2));
-
-      io.emit("show-action", {
-        type: "cagnotte-update",
-        points: cagnottePoints,
-        ts: Date.now(),
-      });
-    }
 
     io.emit("show-action", {
       ...msg,
@@ -110,5 +128,4 @@ io.on("connection", (socket) => {
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
-  console.log(`🚀 Socket.IO listening on port ${PORT}`);
 });
