@@ -2,6 +2,20 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const fs = require("fs");
+const STATE_FILE = "./state.json";
+
+let cagnottePoints = 0;
+
+if (fs.existsSync(STATE_FILE)) {
+  try {
+    const data = JSON.parse(fs.readFileSync(STATE_FILE, "utf-8"));
+    cagnottePoints = data.cagnottePoints ?? 0;
+    console.log("✅ cagnotte restaurée :", cagnottePoints);
+  } catch {
+    console.log("⚠️ état cagnotte corrompu");
+  }
+}
 
 const app = express();
 app.use(cors());
@@ -24,8 +38,13 @@ let drawnNumbers = [];
 let cagnotteState = null;
 
 io.on("connection", (socket) => {
-  console.log("🟢 connecté", socket.id);
-   if (drawnNumbers.length > 0) {
+  socket.emit("show-action", {
+    type: "cagnotte-update",
+    points: cagnottePoints,
+    ts: Date.now(),
+  });
+
+  if (drawnNumbers.length > 0) {
     drawnNumbers.forEach((n) => {
       socket.emit("show-action", {
         type: "number",
@@ -42,7 +61,17 @@ io.on("connection", (socket) => {
   }
 
   socket.on("show-action", (msg) => {
-    console.log("📥 EVENT REÇU:", msg);
+    if (msg.type === "add-points") {
+      cagnottePoints += msg.points;
+
+      fs.writeFileSync(STATE_FILE, JSON.stringify({ cagnottePoints }, null, 2));
+
+      io.emit("show-action", {
+        type: "cagnotte-update",
+        points: cagnottePoints,
+        ts: Date.now(),
+      });
+    }
 
     if (msg.type === "number") {
       if (!drawnNumbers.includes(msg.value)) {
@@ -58,6 +87,17 @@ io.on("connection", (socket) => {
     if (msg.type === "palier" || msg.type === "felicitation") {
       cagnotteState = msg;
     }
+    if (msg.type === "reset-score") {
+      cagnottePoints = 0;
+
+      fs.writeFileSync(STATE_FILE, JSON.stringify({ cagnottePoints }, null, 2));
+
+      io.emit("show-action", {
+        type: "cagnotte-update",
+        points: cagnottePoints,
+        ts: Date.now(),
+      });
+    }
 
     io.emit("show-action", {
       ...msg,
@@ -65,9 +105,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("disconnect", () => {
-    console.log("🔴 déconnecté", socket.id);
-  });
+  socket.on("disconnect", () => {});
 });
 
 const PORT = process.env.PORT || 4000;

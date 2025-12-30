@@ -13,10 +13,9 @@ export default function Page() {
 
   // ✅ Utilisation correcte du hook au niveau racine
   useShowChannel((m: ShowMessage) => {
-    console.log("CAGNOTTE REÇU:", m);
     setLastMsg(m);
 
-    if (m.type === "palier" || m.type === "felicitation") {
+    if (m.type === "palier" || m.type === "felicitation" || m.type === "cagnotte-update") {
       setShowConfetti(true);
 
       setTimeout(() => {

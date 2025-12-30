@@ -26,6 +26,10 @@ export default function ControlPanel() {
     socket.emit("show-action", { type: "felicitation" });
   };
 
+  const resetScore = () => {
+    socket.emit("show-action", { type: "reset-score" });
+  };
+
   return (
     <div className="w-full max-w-5xl mx-auto p-4 md:p-6">
       <h2 className="text-xl md:text-2xl font-semibold">Panel Cagnotte</h2>
@@ -55,6 +59,12 @@ export default function ControlPanel() {
           className="rounded-xl px-4 py-2 font-semibold bg-red-600 text-white hover:bg-red-500 shadow"
         >
           Félicitation
+        </button>
+        <button
+          onClick={resetScore}
+          className="rounded-xl px-4 py-2 font-semibold bg-black text-white hover:bg-gray-800 shadow"
+        >
+          Reset Cagnotte
         </button>
       </div>
 
@@ -98,9 +108,7 @@ export default function ControlPanel() {
 
           <div className="mt-4 text-sm text-white/70">
             Dernier numéro envoyé :{" "}
-            <span className="font-semibold text-white">
-              {active ?? "—"}
-            </span>
+            <span className="font-semibold text-white">{active ?? "—"}</span>
           </div>
         </div>
       </div>

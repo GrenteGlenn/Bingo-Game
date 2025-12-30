@@ -49,6 +49,8 @@ function countCompletedLines(
 
 export default function BingoBoard() {
   const socket = useSocket();
+  const prevCompletedLinesRef = useRef(0);
+  const fullGridRef = useRef(false);
 
   const rows = 5;
   const cols = 5;
@@ -118,15 +120,48 @@ export default function BingoBoard() {
     };
   }, [socket, rows, cols]);
 
-  // ✅ CLIC LOCAL UNIQUEMENT (PAR JOUEUR)
   const toggleCell = (row: number, col: number) => {
     const key: CellKey = `${row}-${col}`;
+
     setSelected((prev) => {
       const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
+
+      if (next.has(key)) return next;
+
+      next.add(key);
+
+      socket.emit("show-action", {
+        type: "add-points",
+        points: 12,
+      });
+
       return next;
     });
   };
+
+  useEffect(() => {
+    // ➕ lignes / colonnes
+    if (completedLines > prevCompletedLinesRef.current) {
+      const gained = (completedLines - prevCompletedLinesRef.current) * 30;
+
+      socket.emit("show-action", {
+        type: "add-points",
+        points: gained,
+      });
+    }
+
+    prevCompletedLinesRef.current = completedLines;
+
+    // 🟩 grille complète
+    if (selected.size === rows * cols && !fullGridRef.current) {
+      fullGridRef.current = true;
+
+      socket.emit("show-action", {
+        type: "add-points",
+        points: 100,
+      });
+    }
+  }, [completedLines, selected, socket, rows, cols]);
 
   if (numbers.length === 0) {
     return <div className="text-white/70">Chargement…</div>;
@@ -134,9 +169,7 @@ export default function BingoBoard() {
 
   return (
     <div className="flex flex-col items-center p-4 gap-3">
-      {showConfetti && (
-        <FireSideConfetti key={confettiRunId} duration={3000} />
-      )}
+      {showConfetti && <FireSideConfetti key={confettiRunId} duration={3000} />}
 
       {showBingo && (
         <div className="rounded-lg bg-green-600 px-4 py-2 text-white font-semibold">
