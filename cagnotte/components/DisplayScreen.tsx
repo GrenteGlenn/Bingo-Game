@@ -7,12 +7,8 @@ export default function DisplayScreen() {
   const [values, setValues] = useState<number[]>([]);
 
   useShowChannel((m) => {
-    console.log("📺 DisplayScreen reçoit :", m);
-
     if (m.type === "number") {
-      setValues((prev) =>
-        prev.includes(m.value) ? prev : [...prev, m.value]
-      );
+      setValues((prev) => (prev.includes(m.value) ? prev : [...prev, m.value]));
     }
 
     if (m.type === "reset-bingo") {
@@ -21,23 +17,58 @@ export default function DisplayScreen() {
   });
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-4">
-      <div className="text-center w-full max-w-7xl">
-        <div className="text-white text-lg md:text-3xl mt-2 mb-2">
+    <div className="w-full  flex items-center justify-center p-6">
+      <div className="w-full max-w-7xl">
+        <div>
+          <img
+            className="h-50 mx-auto"
+            src="/images/bingoOr.png"
+            alt="Bingo en Or"
+          />
+        </div>
+
+        <div className="text-white text-lg md:text-3xl font-semibold text-center mb-6">
           Numéros tirés
         </div>
 
-        <div className="grid gap-[2px] grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
-          {values.map((num) => (
-            <div
-              key={num}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-[#00A6D9] text-white font-black"
-            >
-              {num}
-            </div>
-          ))}
+        <div className="rounded-2xl  p-3 md:p-4">
+          <div className="grid gap-2 grid-cols-5 sm:grid-cols-8 md:grid-cols-10">
+            {[...values]
+              .sort((a, b) => a - b)
+              .map((num) => (
+                <div
+                  key={num}
+                  className="
+        flex items-center justify-center
+        rounded-xl
+        font-bold
+        text-4xl sm:text-4xl md:text-5xl lg:text-6xl
+        text-white
+      "
+                >
+                  {num}
+                </div>
+              ))}
+          </div>
         </div>
       </div>
+      <div className="absolute bottom-60 left-1/2 transform -translate-x-2/4 z-10">
+        <img src="/images/voeux.png" alt="" />
+      </div>
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
+        <img
+          src="/images/RTE_logo.png"
+          alt="RTE"
+          className="
+          h-20 md:h-24 lg:h-28
+          opacity-90
+          drop-shadow-[0_6px_20px_rgba(0,0,0,0.35)]
+          "
+        />
+      </div>
+      <span className="absolute bottom-50 left-1/2 transform -translate-x-2/4 z-10 text-white">
+        15 janvier
+      </span>
     </div>
   );
 }

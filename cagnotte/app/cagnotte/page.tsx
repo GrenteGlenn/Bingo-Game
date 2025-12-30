@@ -15,7 +15,10 @@ export default function Page() {
   useShowChannel((m: ShowMessage) => {
     if (m.type === "cagnotte-update") {
       setScore(m.points);
-      return; 
+      return;
+    }
+    if (m.type === "number") {
+      return;
     }
 
     setLastMsg(m);
@@ -57,7 +60,7 @@ export default function Page() {
       </div>
 
       <span className="absolute bottom-50 left-1/2 transform -translate-x-2/4 z-10 text-white">
-        15/01/2026
+        15 janvier
       </span>
 
       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
@@ -88,7 +91,7 @@ export default function Page() {
         </div>
       )}
 
-      <div className="absolute bottom-[20%] left-3 z-10 w-full h-11/12">
+      <div className="absolute bottom-[25%] left-3 z-10 w-full h-11/12">
         <Cagnotte3D />
       </div>
     </main>

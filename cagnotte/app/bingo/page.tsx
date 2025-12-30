@@ -33,8 +33,7 @@ export default function bingo() {
         <img className="h-50" src="/images/bingoOr.png" alt="Bingo en Or" />
       </div>
       <div className="flex self-start flex-row">
-        <span className=" underline mr-2">Joueur(se): </span>{" "}
-        <span className="font-semibold mt-0.5">{playerName}</span>
+        <span className="font-semibold mt-0.5 text-white">{playerName}</span>
       </div>
       <CellBingo />
       <div className="">

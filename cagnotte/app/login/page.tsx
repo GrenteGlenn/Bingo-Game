@@ -1,4 +1,5 @@
 "use client";
+import { getPlayerToken } from "@/lib/playerToken";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -9,25 +10,18 @@ export default function Page() {
 
   const isValidName = (value: string) => /^[a-zA-ZÀ-ÿ\s-]+$/.test(value.trim());
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const trimmed = name.trim();
+  const trimmed = name.trim();
+  if (!trimmed || !isValidName(trimmed)) return;
 
-    if (!trimmed) {
-      setError("Le nom est obligatoire");
-      return;
-    }
+  sessionStorage.setItem("playerName", trimmed);
 
-    if (!isValidName(trimmed)) {
-      setError("Caractères autorisés : lettres, espaces et tirets");
-      return;
-    }
-    sessionStorage.setItem("playerName", trimmed);
+  getPlayerToken();
 
-    router.push("/bingo");
-  };
-
+  router.push("/bingo");
+};
   return (
     <div
       className="
@@ -48,7 +42,6 @@ export default function Page() {
         />
       </div>
 
-      {/* FORM */}
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-xs sm:max-w-sm flex flex-col gap-4"

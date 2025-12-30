@@ -1,3 +1,41 @@
 {
-  "cagnottePoints": 0
+  "cagnottePoints": 0,
+  "drawnNumbers": [],
+  "cagnotteState": null,
+  "players": [
+    {
+      "token": "3f1e3d1a-9d87-49c0-a0df-ba4487e37af0",
+      "numbers": [
+        31,
+        16,
+        28,
+        46,
+        40,
+        11,
+        27,
+        15,
+        2,
+        13,
+        50,
+        23,
+        45,
+        3,
+        36,
+        25,
+        7,
+        18,
+        42,
+        44,
+        17,
+        20,
+        12,
+        39,
+        6
+      ],
+      "selected": [],
+      "completedLines": 0,
+      "isFull": false,
+      "lastActivity": 1767134751488
+    }
+  ]
 }

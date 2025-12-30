@@ -31,7 +31,6 @@ export default function CagnotteTube() {
 
     controls.enableDamping = true;
 
-    // 🌟 Groupe pour la cagnotte (tube + base + pièces)
     const cagnotteGroup = new THREE.Group();
     scene.add(cagnotteGroup);
 
@@ -52,21 +51,49 @@ export default function CagnotteTube() {
     const tubeGeo = new THREE.CylinderGeometry(1.5, 1.5, 4, 64, 1, true);
     const tubeMat = new THREE.MeshPhysicalMaterial({
       color: 0xffffff,
-      transparent: true,
-      opacity: 0.3,
       roughness: 0,
-      transmission: 1,
-      thickness: 0.1,
+      thickness: 0.4,
+      transparent: true,
+      opacity: 0.25,
+      envMapIntensity: 2,
     });
+
     const tube = new THREE.Mesh(tubeGeo, tubeMat);
     cagnotteGroup.add(tube);
 
+    // ✨ Anneaux lumineux dans le tube
+    const ringYs = [-1.2, -0.6, 0, 0.6, 1.2];
+
+    const ringMaterial = new THREE.MeshStandardMaterial({
+      color: 0x4fd1ff,
+      transparent: true,
+      opacity: 0.35,
+      emissive: new THREE.Color(0x4fd1ff),
+      emissiveIntensity: 2,
+      side: THREE.DoubleSide,
+    });
+
+    ringYs.forEach((y) => {
+      const ringGeo = new THREE.RingGeometry(1.4, 1.6, 72);
+      const ring = new THREE.Mesh(ringGeo, ringMaterial);
+
+      ring.rotation.x = Math.PI / 2;
+      ring.position.y = y;
+      ring.position.z = 0.01;
+
+      cagnotteGroup.add(ring);
+    });
+
     // Base
-    const baseGeo = new THREE.CircleGeometry(1.5, 64);
-    const baseMat = new THREE.MeshStandardMaterial({ color: 0x00a6d9 });
+    const baseGeo = new THREE.CylinderGeometry(1.6, 1.8, 0.2, 44);
+    const baseMat = new THREE.MeshStandardMaterial({
+      color: 0x00a6d9,
+      metalness: 0.4,
+      roughness: 0.2,
+    });
     const base = new THREE.Mesh(baseGeo, baseMat);
-    base.rotation.x = -Math.PI / 2;
-    base.position.y = -2;
+    base.position.y = -2.2;
+
     cagnotteGroup.add(base);
 
     // Pièces
@@ -141,6 +168,12 @@ export default function CagnotteTube() {
           coins.splice(i, 1);
         }
       }
+      const t = Date.now() * 0.002;
+      cagnotteGroup.children.forEach((obj) => {
+        if (obj.geometry instanceof THREE.RingGeometry) {
+          obj.material.opacity = 0.25 + Math.sin(t) * 0.05;
+        }
+      });
 
       // Rotation du groupe
       cagnotteGroup.rotation.y += rotationSpeedY;

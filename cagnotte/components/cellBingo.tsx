@@ -1,19 +1,28 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import FireSideConfetti from "./ConfettiSideCannons";
 import { useSocket } from "@/app/providers/socket-providers";
+import { getPlayerToken } from "@/lib/playerToken";
 
 type CellKey = `${number}-${number}`;
 
-function shuffle1toN(n: number) {
-  const array = Array.from({ length: n }, (_, i) => i + 1);
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
+type PlayerStateAction = {
+  type: "player-state";
+  numbers: number[];
+  selected: string[];
+  ts?: number;
+};
+
+type ResetBingoAction = {
+  type: "reset-bingo";
+  ts?: number;
+};
+
+type ShowAction =
+  | PlayerStateAction
+  | ResetBingoAction
+  | { type: string; [k: string]: any };
 
 function countCompletedLines(
   selected: Set<CellKey>,
@@ -22,26 +31,18 @@ function countCompletedLines(
 ) {
   let count = 0;
 
-  // lignes
-  for (let row = 0; row < rows; row++) {
-    if (
-      Array.from({ length: cols }).every((_, col) =>
-        selected.has(`${row}-${col}` as CellKey)
-      )
-    ) {
-      count++;
-    }
+  for (let r = 0; r < rows; r++) {
+    const ok = Array.from({ length: cols }).every((_, c) =>
+      selected.has(`${r}-${c}` as CellKey)
+    );
+    if (ok) count++;
   }
 
-  // colonnes
-  for (let col = 0; col < cols; col++) {
-    if (
-      Array.from({ length: rows }).every((_, row) =>
-        selected.has(`${row}-${col}` as CellKey)
-      )
-    ) {
-      count++;
-    }
+  for (let c = 0; c < cols; c++) {
+    const ok = Array.from({ length: rows }).every((_, r) =>
+      selected.has(`${r}-${c}` as CellKey)
+    );
+    if (ok) count++;
   }
 
   return count;
@@ -49,8 +50,7 @@ function countCompletedLines(
 
 export default function BingoBoard() {
   const socket = useSocket();
-  const prevCompletedLinesRef = useRef(0);
-  const fullGridRef = useRef(false);
+  const token = useMemo(() => getPlayerToken(), []);
 
   const rows = 5;
   const cols = 5;
@@ -64,9 +64,10 @@ export default function BingoBoard() {
 
   const prevLineCountRef = useRef(0);
   const timersRef = useRef<number[]>([]);
+  const retryTimerRef = useRef<number | null>(null);
 
   const clearTimers = () => {
-    timersRef.current.forEach((t) => window.clearTimeout(t));
+    timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
   };
 
@@ -84,15 +85,83 @@ export default function BingoBoard() {
     );
   };
 
-  // 🎲 init grille (LOCAL, par joueur)
   useEffect(() => {
-    setNumbers(shuffle1toN(rows * cols));
-    return () => clearTimers();
-  }, []);
+    if (!socket || !token) return;
+
+    const requestState = () => {
+      socket.emit("request-player-state", { token });
+    };
+
+    const startRetryLoop = () => {
+      // si déjà une boucle, ne pas empiler
+      if (retryTimerRef.current) return;
+
+      retryTimerRef.current = window.setInterval(() => {
+        if (!socket.connected) return;
+        requestState();
+        if (retryTimerRef.current) {
+          clearInterval(retryTimerRef.current);
+          retryTimerRef.current = null;
+        }
+      }, 300);
+    };
+
+    const onConnect = () => {
+      requestState();
+    };
+
+    if (socket.connected) {
+      requestState();
+    } else {
+      socket.on("connect", onConnect);
+      startRetryLoop();
+    }
+
+    return () => {
+      socket.off("connect", onConnect);
+      if (retryTimerRef.current) {
+        clearInterval(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
+    };
+  }, [socket, token]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handler = (msg: ShowAction) => {
+      if (msg.type === "player-state") {
+        setNumbers(Array.isArray(msg.numbers) ? msg.numbers : []);
+        const arr = Array.isArray(msg.selected) ? msg.selected : [];
+        setSelected(new Set<CellKey>(arr as CellKey[]));
+        return;
+      }
+
+      if (msg.type === "reset-bingo") {
+        clearTimers();
+        prevLineCountRef.current = 0;
+
+        setShowBingo(false);
+        setShowConfetti(false);
+        setSelected(new Set<CellKey>());
+        setNumbers([]);
+
+        // redemande une nouvelle grille serveur
+        socket.emit("request-player-state", { token });
+        return;
+      }
+
+      // sinon on ignore (cagnotte-update, number, etc.)
+    };
+
+    socket.on("show-action", handler);
+    return () => {
+      socket.off("show-action", handler);
+    };
+  }, [socket, token]);
 
   const completedLines = countCompletedLines(selected, rows, cols);
 
-  // 🎉 détection bingo (LOCAL)
   useEffect(() => {
     if (completedLines > prevLineCountRef.current) {
       triggerBingoFx();
@@ -100,70 +169,27 @@ export default function BingoBoard() {
     prevLineCountRef.current = completedLines;
   }, [completedLines]);
 
-  // 🔌 SOCKET : SEULEMENT LE RESET GLOBAL
-  useEffect(() => {
-    const handler = (msg: any) => {
-      if (msg.type === "reset-bingo") {
-        clearTimers();
-        prevLineCountRef.current = 0;
-
-        setShowBingo(false);
-        setShowConfetti(false);
-        setSelected(new Set());
-        setNumbers(shuffle1toN(rows * cols));
-      }
-    };
-
-    socket.on("show-action", handler);
-    return () => {
-      socket.off("show-action", handler);
-    };
-  }, [socket, rows, cols]);
-
   const toggleCell = (row: number, col: number) => {
+    if (!socket || !socket.connected) return;
+
     const key: CellKey = `${row}-${col}`;
 
+    // UI optimiste
     setSelected((prev) => {
       const next = new Set(prev);
-
-      if (next.has(key)) return next;
-
-      next.add(key);
-
-      socket.emit("show-action", {
-        type: "add-points",
-        points: 12,
-      });
-
+      next.has(key) ? next.delete(key) : next.add(key);
       return next;
+    });
+
+    socket.emit("show-action", {
+      type: "toggle-cell",
+      row,
+      col,
+      token,
     });
   };
 
-  useEffect(() => {
-    // ➕ lignes / colonnes
-    if (completedLines > prevCompletedLinesRef.current) {
-      const gained = (completedLines - prevCompletedLinesRef.current) * 30;
-
-      socket.emit("show-action", {
-        type: "add-points",
-        points: gained,
-      });
-    }
-
-    prevCompletedLinesRef.current = completedLines;
-
-    // 🟩 grille complète
-    if (selected.size === rows * cols && !fullGridRef.current) {
-      fullGridRef.current = true;
-
-      socket.emit("show-action", {
-        type: "add-points",
-        points: 100,
-      });
-    }
-  }, [completedLines, selected, socket, rows, cols]);
-
-  if (numbers.length === 0) {
+  if (numbers.length !== rows * cols) {
     return <div className="text-white/70">Chargement…</div>;
   }
 
