@@ -10,17 +10,21 @@ import FireSideConfetti from "@/components/ConfettiSideCannons";
 export default function Page() {
   const [lastMsg, setLastMsg] = useState<ShowMessage | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [score, setScore] = useState<number>(0);
 
-  // ✅ Utilisation correcte du hook au niveau racine
   useShowChannel((m: ShowMessage) => {
+    // 💰 mise à jour score
+    if (m.type === "cagnotte-update") {
+      setScore(m.points);
+      return; // ❗ pas d’animation centrale
+    }
+
+    // 🎯 messages visuels
     setLastMsg(m);
 
-    if (m.type === "palier" || m.type === "felicitation" || m.type === "cagnotte-update") {
+    if (m.type === "palier" || m.type === "felicitation") {
       setShowConfetti(true);
-
-      setTimeout(() => {
-        setShowConfetti(false);
-      }, 3000);
+      setTimeout(() => setShowConfetti(false), 3000);
     }
   });
 
@@ -34,25 +38,34 @@ export default function Page() {
     <main className="relative w-full h-screen overflow-hidden">
       {showConfetti && <FireSideConfetti duration={3000} />}
 
+      {/* 💰 SCORE */}
+      <div className="
+        absolute top-4 right-4 z-30
+        rounded-2xl bg-black/60 backdrop-blur-md
+        px-4 py-2 text-white font-black
+        text-lg md:text-2xl shadow-lg
+      ">
+        💰 {score.toLocaleString()} pts
+      </div>
+
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
         style={{ backgroundImage: "url('/images/podium6.webp')" }}
       />
+
       <div className="absolute bottom-50 left-1/2 transform -translate-x-2/4 z-10">
         <img src="/images/voeux.png" alt="" />
       </div>
-      <span className="absolute bottom-50 left-1/2 transform -translate-x-2/4 z-10 text-white font-sans ">
+
+      <span className="absolute bottom-50 left-1/2 transform -translate-x-2/4 z-10 text-white">
         15/01/2026
       </span>
+
       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
         <img
           src="/images/RTE_logo.png"
           alt="RTE"
-          className="
-          h-20 md:h-24 lg:h-28
-          opacity-90
-          drop-shadow-[0_6px_20px_rgba(0,0,0,0.35)]
-          "
+          className="h-20 md:h-24 lg:h-28 opacity-90 drop-shadow-[0_6px_20px_rgba(0,0,0,0.35)]"
         />
       </div>
 
@@ -62,13 +75,11 @@ export default function Page() {
             <div
               key={lastMsg.ts}
               className="
-          animate-zoom-in
-          font-black tracking-tight
-          text-[10vw] md:text-[8vw] lg:text-[6vw]
-          leading-none
-          text-white
-          drop-shadow-[0_18px_60px_rgba(255,255,255,0.35)]
-        "
+                animate-zoom-in font-black tracking-tight
+                text-[10vw] md:text-[8vw] lg:text-[6vw]
+                leading-none text-white
+                drop-shadow-[0_18px_60px_rgba(255,255,255,0.35)]
+              "
             >
               {lastMsg.type === "number" && lastMsg.value}
               {lastMsg.type === "palier" && `PALIER ${lastMsg.level}`}
