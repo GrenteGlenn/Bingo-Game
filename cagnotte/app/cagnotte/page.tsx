@@ -94,6 +94,19 @@ export default function Page() {
       <div className="absolute bottom-[25%] left-3 z-10 w-full h-11/12">
         <Cagnotte3D />
       </div>
+      <div
+        className="
+    absolute
+    top-1/2 left-4
+    -translate-y-1/2
+    z-10
+    w-[220px]
+    md:w-[280px]
+    lg:w-[320px]
+  "
+      >
+        <img src="/images/qrcode.png" alt="" />
+      </div>
     </main>
   );
 }
