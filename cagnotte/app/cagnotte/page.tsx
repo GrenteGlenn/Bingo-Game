@@ -105,7 +105,7 @@ export default function Page() {
     lg:w-[320px]
   "
       >
-        <img src="/images/qrcode.png" alt="" />
+        <img src="/images/qrcode2.png" alt="" />
       </div>
     </main>
   );
