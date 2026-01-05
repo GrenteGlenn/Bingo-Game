@@ -18,10 +18,22 @@ export function useShowChannel(cb: Listener) {
       cbRef.current(m);
     };
 
+    const handleConnect = () => {
+      console.log("📡 Display connecté → resync");
+      socket.emit("request-full-state");
+    };
+
     socket.on("show-action", handler);
+    socket.on("connect", handleConnect);
+
+    // si déjà connecté (reload)
+    if (socket.connected) {
+      handleConnect();
+    }
 
     return () => {
       socket.off("show-action", handler);
+      socket.off("connect", handleConnect);
     };
   }, [socket]);
 }

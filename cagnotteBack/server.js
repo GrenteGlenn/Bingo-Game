@@ -22,8 +22,6 @@ function drawUniqueNumbers(min, max, count) {
   return pool.slice(0, count);
 }
 
-
-
 const app = express();
 app.use(cors());
 app.get("/", (_, res) => res.send("OK"));
@@ -41,7 +39,6 @@ let cagnotteState = null;
 // joueurs par token
 const players = new Map();
 
-
 if (fs.existsSync(STATE_FILE)) {
   try {
     const data = JSON.parse(fs.readFileSync(STATE_FILE, "utf-8"));
@@ -52,7 +49,9 @@ if (fs.existsSync(STATE_FILE)) {
 
     data.players?.forEach((p) => {
       players.set(p.token, {
-        numbers: Array.isArray(p.numbers) ? p.numbers : drawUniqueNumbers(1, 50, 25),
+        numbers: Array.isArray(p.numbers)
+          ? p.numbers
+          : drawUniqueNumbers(1, 50, 25),
         selected: new Set(Array.isArray(p.selected) ? p.selected : []),
         completedLines: p.completedLines ?? 0,
         isFull: !!p.isFull,
@@ -63,8 +62,6 @@ if (fs.existsSync(STATE_FILE)) {
     console.error("❌ Failed to load state", e);
   }
 }
-
-
 
 let saveTimeout = null;
 
@@ -91,11 +88,10 @@ function scheduleSave() {
   }, 500);
 }
 
-
 function getPlayer(token) {
   if (!players.has(token)) {
     players.set(token, {
-      numbers: drawUniqueNumbers(1, 50, 25), 
+      numbers: drawUniqueNumbers(1, 50, 25),
       selected: new Set(),
       completedLines: 0,
       isFull: false,
@@ -134,7 +130,6 @@ function emitPlayerState(socket, token) {
   });
 }
 
-
 io.on("connection", (socket) => {
   /* --- sync global --- */
   socket.emit("show-action", {
@@ -151,13 +146,11 @@ io.on("connection", (socket) => {
     socket.emit("show-action", { ...cagnotteState, ts: Date.now() });
   }
 
-
   socket.on("request-player-state", ({ token }) => {
     if (!token) return;
     emitPlayerState(socket, token);
     scheduleSave();
   });
-
 
   socket.on("show-action", (msg) => {
     /* 🎯 TOGGLE CELL */
@@ -205,6 +198,31 @@ io.on("connection", (socket) => {
       scheduleSave();
       return;
     }
+    socket.on("request-full-state", () => {
+      // renvoi tous les numéros déjà tirés
+      drawnNumbers.forEach((n) => {
+        socket.emit("show-action", {
+          type: "number",
+          value: n,
+          ts: Date.now(),
+        });
+      });
+
+      // état cagnotte
+      socket.emit("show-action", {
+        type: "cagnotte-update",
+        points: cagnottePoints,
+        ts: Date.now(),
+      });
+
+      // état spécial (palier / félicitation)
+      if (cagnotteState) {
+        socket.emit("show-action", {
+          ...cagnotteState,
+          ts: Date.now(),
+        });
+      }
+    });
 
     /*  RESET GLOBAL */
     if (msg.type === "reset-bingo") {
@@ -246,7 +264,6 @@ setInterval(() => {
   }
   scheduleSave();
 }, 60_000);
-
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
