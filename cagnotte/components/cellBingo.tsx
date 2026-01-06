@@ -258,7 +258,9 @@ export default function BingoBoard() {
 
   const [numbers, setNumbers] = useState<number[]>([]);
   const [selected, setSelected] = useState<Set<CellKey>>(new Set());
+  const [ready, setReady] = useState(false);
 
+  // 1️⃣ Attacher le listener AVANT toute demande
   useEffect(() => {
     if (!socket) return;
 
@@ -266,11 +268,13 @@ export default function BingoBoard() {
       if (msg.type === "player-state") {
         setNumbers(msg.numbers);
         setSelected(new Set(msg.selected));
+        setReady(true);
       }
+
       if (msg.type === "reset-bingo") {
         setNumbers([]);
         setSelected(new Set());
-        socket.emit("request-player-state", { token });
+        setReady(false);
       }
     };
 
@@ -278,6 +282,21 @@ export default function BingoBoard() {
     return () => {
       socket.off("show-action", handler);
     };
+  }, [socket]);
+
+  // 2️⃣ Demander la grille UNIQUEMENT quand le socket est prêt
+  useEffect(() => {
+    if (!socket || !token) return;
+
+    const request = () => {
+      socket.emit("request-player-state", { token });
+    };
+
+    if (socket.connected) {
+      request();
+    } else {
+      socket.once("connect", request);
+    }
   }, [socket, token]);
 
   const toggleCell = (row: number, col: number) => {
@@ -289,7 +308,7 @@ export default function BingoBoard() {
     });
   };
 
-  if (numbers.length !== rows * cols) {
+  if (!ready) {
     return <div className="text-white/70">Chargement…</div>;
   }
 

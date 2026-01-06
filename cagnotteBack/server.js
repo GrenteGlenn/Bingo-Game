@@ -116,13 +116,13 @@ function emitPlayerState(socket, token) {
 
 /* ---------- SOCKET ---------- */
 io.on("connection", (socket) => {
-  const token = socket.handshake.auth?.token;
+  // const token = socket.handshake.auth?.token;
 
-  // ✅ GRILLE ENVOYÉE IMMÉDIATEMENT AU LOGIN
-  if (token) {
-    emitPlayerState(socket, token);
-    scheduleSave();
-  }
+  // // ✅ GRILLE ENVOYÉE IMMÉDIATEMENT AU LOGIN
+  // if (token) {
+  //   emitPlayerState(socket, token);
+  //   scheduleSave();
+  // }
 
   socket.emit("show-action", {
     type: "cagnotte-update",
