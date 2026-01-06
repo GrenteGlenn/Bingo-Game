@@ -115,19 +115,12 @@ io.on("connection", (socket) => {
   const token = socket.handshake.auth?.token;
 
   if (token) {
-    // ✅ CRÉATION OU RÉCUPÉRATION DU JOUEUR
-    emitPlayerState(socket, token);
-    scheduleSave();
+    emitPlayerState(socket, token); // ✅ UNE SEULE FOIS
   }
 
   socket.emit("show-action", {
     type: "cagnotte-update",
     points: cagnottePoints,
-  });
-
-  socket.on("request-player-state", ({ token }) => {
-    if (!token) return;
-    emitPlayerState(socket, token);
   });
 
   socket.on("show-action", (msg) => {
@@ -140,13 +133,11 @@ io.on("connection", (socket) => {
 
       emitPlayerState(socket, token);
       scheduleSave();
-      return;
     }
 
     if (msg.type === "reset-bingo") {
       players.clear();
 
-      // ⚠️ recrée les grilles pour TOUS les sockets connectés
       for (const s of io.sockets.sockets.values()) {
         const t = s.handshake.auth?.token;
         if (t) emitPlayerState(s, t);
@@ -154,15 +145,17 @@ io.on("connection", (socket) => {
 
       io.emit("show-action", { type: "reset-bingo" });
       scheduleSave();
-      return;
     }
 
     if (msg.type === "number") {
       if (!drawnNumbers.includes(msg.value)) {
         drawnNumbers.push(msg.value);
       }
-      io.emit("show-action", { type: "number", value: msg.value, ts: Date.now() });
-      scheduleSave();
+      io.emit("show-action", {
+        type: "number",
+        value: msg.value,
+        ts: Date.now(),
+      });
     }
 
     if (msg.type === "palier" || msg.type === "felicitation") {

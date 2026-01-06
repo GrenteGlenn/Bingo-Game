@@ -306,57 +306,45 @@ export default function BingoBoard() {
   };
 
   // listener socket
- useEffect(() => {
-  if (!socket || !token) return;
-
-  const handler = (msg: any) => {
-    if (msg.type === "player-state") {
-      const selectedSet = new Set<CellKey>(msg.selected);
-
-      setNumbers(msg.numbers);
-      setSelected(selectedSet);
-      setReady(true);
-
-      if (!hasHydratedRef.current) {
-        prevLineCountRef.current = countCompletedLines(
-          selectedSet,
-          rows,
-          cols
-        );
-        hasHydratedRef.current = true;
-      }
-    }
-
-    if (msg.type === "reset-bingo") {
-      hasHydratedRef.current = false;
-      prevLineCountRef.current = 0;
-
-      clearTimers();
-      setReady(false);
-      setNumbers([]);
-      setSelected(new Set());
-
-      socket.emit("request-player-state", { token });
-    }
-  };
-
-  socket.on("show-action", handler);
-
-  return () => {
-    socket.off("show-action", handler);
-  };
-}, [socket, token]);
-
-  // demande initiale
   useEffect(() => {
-    if (!socket || !token) return;
+    if (!socket) return;
 
-    const request = () => {
-      socket.emit("request-player-state", { token });
+    const handler = (msg: any) => {
+      if (msg.type === "player-state") {
+        const selectedSet = new Set<CellKey>(msg.selected);
+
+        setNumbers(msg.numbers);
+        setSelected(selectedSet);
+        setReady(true);
+
+        if (!hasHydratedRef.current) {
+          prevLineCountRef.current = countCompletedLines(
+            selectedSet,
+            rows,
+            cols
+          );
+          hasHydratedRef.current = true;
+        }
+      }
+
+      if (msg.type === "reset-bingo") {
+        hasHydratedRef.current = false;
+        prevLineCountRef.current = 0;
+
+        clearTimers();
+        setReady(false);
+        setNumbers([]);
+        setSelected(new Set());
+      }
     };
 
-    request(); // 🔥 TOUJOURS
-  }, [socket, token]);
+    socket.on("show-action", handler);
+
+    // ✅ IMPORTANT : cleanup qui retourne VOID
+    return () => {
+      socket.off("show-action", handler);
+    };
+  }, [socket]);
 
   // 🎯 DÉTECTION BINGO
   const completedLines = countCompletedLines(selected, rows, cols);
