@@ -6,7 +6,7 @@ const fs = require("fs");
 
 const STATE_FILE = "./state.json";
 
-
+/* ---------- UTILS ---------- */
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -22,6 +22,7 @@ function drawUniqueNumbers(min, max, count) {
   return pool.slice(0, count);
 }
 
+/* ---------- APP ---------- */
 const app = express();
 app.use(cors());
 app.get("/", (_, res) => res.send("OK"));
@@ -32,12 +33,12 @@ const io = new Server(server, {
   cors: { origin: "*", methods: ["GET", "POST"] },
 });
 
-
+/* ---------- STATE ---------- */
 let cagnottePoints = 0;
 let drawnNumbers = [];
 const players = new Map();
 
-
+/* ---------- LOAD ---------- */
 if (fs.existsSync(STATE_FILE)) {
   try {
     const data = JSON.parse(fs.readFileSync(STATE_FILE, "utf-8"));
@@ -46,21 +47,19 @@ if (fs.existsSync(STATE_FILE)) {
 
     data.players?.forEach((p) => {
       players.set(p.token, {
-        numbers: Array.isArray(p.numbers)
-          ? p.numbers
-          : drawUniqueNumbers(1, 50, 25),
-        selected: new Set(Array.isArray(p.selected) ? p.selected : []),
+        numbers: p.numbers ?? drawUniqueNumbers(1, 50, 25),
+        selected: new Set(p.selected ?? []),
         completedLines: p.completedLines ?? 0,
         isFull: !!p.isFull,
-        lastActivity: p.lastActivity ?? Date.now(),
+        lastActivity: Date.now(),
       });
     });
   } catch (e) {
-    console.error("❌ Failed to load state", e);
+    console.error("❌ load error", e);
   }
 }
 
-
+/* ---------- SAVE ---------- */
 let saveTimeout = null;
 
 function scheduleSave() {
@@ -76,16 +75,20 @@ function scheduleSave() {
         selected: [...p.selected],
         completedLines: p.completedLines,
         isFull: p.isFull,
-        lastActivity: p.lastActivity,
       })),
     };
 
-    fs.writeFileSync(STATE_FILE, JSON.stringify(data, null, 2));
+    fs.writeFileSync(
+      STATE_FILE,
+      JSON.stringify(data, null, 2)
+    );
+
     saveTimeout = null;
   }, 500);
 }
 
 
+/* ---------- HELPERS ---------- */
 function getPlayer(token) {
   if (!players.has(token)) {
     players.set(token, {
@@ -96,117 +99,48 @@ function getPlayer(token) {
       lastActivity: Date.now(),
     });
   }
-  const player = players.get(token);
-  player.lastActivity = Date.now();
-  return player;
-}
-
-function countCompletedLines(selected) {
-  const rows = 5;
-  const cols = 5;
-  let count = 0;
-
-  for (let r = 0; r < rows; r++) {
-    if ([...Array(cols)].every((_, c) => selected.has(`${r}-${c}`))) count++;
-  }
-  for (let c = 0; c < cols; c++) {
-    if ([...Array(rows)].every((_, r) => selected.has(`${r}-${c}`))) count++;
-  }
-  return count;
+  const p = players.get(token);
+  p.lastActivity = Date.now();
+  return p;
 }
 
 function emitPlayerState(socket, token) {
-  const player = getPlayer(token);
+  const p = getPlayer(token);
   socket.emit("show-action", {
     type: "player-state",
-    numbers: player.numbers,
-    selected: [...player.selected],
+    numbers: p.numbers,
+    selected: [...p.selected],
     ts: Date.now(),
   });
 }
 
-
+/* ---------- SOCKET ---------- */
 io.on("connection", (socket) => {
-    const token = socket.handshake.auth?.token;
+  const token = socket.handshake.auth?.token;
 
+  // ✅ GRILLE ENVOYÉE IMMÉDIATEMENT AU LOGIN
   if (token) {
-    emitPlayerState(socket, token); // ✅ envoi immédiat de la grille
+    emitPlayerState(socket, token);
     scheduleSave();
   }
+
   socket.emit("show-action", {
     type: "cagnotte-update",
     points: cagnottePoints,
-    ts: Date.now(),
-  });
-
-  drawnNumbers.forEach((n) => {
-    socket.emit("show-action", {
-      type: "number",
-      value: n,
-      ts: Date.now(),
-    });
-  });
-
-  socket.on("request-full-state", () => {
-    drawnNumbers.forEach((n) => {
-      socket.emit("show-action", {
-        type: "number",
-        value: n,
-        ts: Date.now(),
-      });
-    });
-
-    socket.emit("show-action", {
-      type: "cagnotte-update",
-      points: cagnottePoints,
-      ts: Date.now(),
-    });
   });
 
   socket.on("request-player-state", ({ token }) => {
     if (!token) return;
     emitPlayerState(socket, token);
-    scheduleSave();
   });
 
   socket.on("show-action", (msg) => {
     if (msg.type === "toggle-cell") {
       const { token, row, col } = msg;
-      if (!token) return;
-
       const key = `${row}-${col}`;
-      const player = getPlayer(token);
+      const p = getPlayer(token);
 
-      if (player.selected.has(key)) {
-        player.selected.delete(key);
-        cagnottePoints -= 12;
-      } else {
-        player.selected.add(key);
-        cagnottePoints += 12;
-      }
-
-      const lines = countCompletedLines(player.selected);
-      const diff = lines - player.completedLines;
-      if (diff !== 0) {
-        cagnottePoints += diff * 30;
-        player.completedLines = lines;
-      }
-
-      const isFull = player.selected.size === 25;
-      if (isFull && !player.isFull) {
-        cagnottePoints += 100;
-        player.isFull = true;
-      }
-      if (!isFull && player.isFull) {
-        cagnottePoints -= 100;
-        player.isFull = false;
-      }
-
-      io.emit("show-action", {
-        type: "cagnotte-update",
-        points: cagnottePoints,
-        ts: Date.now(),
-      });
+      p.selected.has(key) ? p.selected.delete(key) : p.selected.add(key);
 
       emitPlayerState(socket, token);
       scheduleSave();
@@ -217,47 +151,12 @@ io.on("connection", (socket) => {
       players.clear();
       drawnNumbers = [];
       cagnottePoints = 0;
-
+      io.emit("show-action", { type: "reset-bingo" });
       scheduleSave();
-
-      io.emit("show-action", { type: "reset-bingo", ts: Date.now() });
-      io.emit("show-action", {
-        type: "cagnotte-update",
-        points: 0,
-        ts: Date.now(),
-      });
-      return;
     }
-
-    if (msg.type === "number") {
-      if (!drawnNumbers.includes(msg.value)) {
-        drawnNumbers.push(msg.value);
-      }
-    }
-
-    if (msg.type === "palier" || msg.type === "felicitation") {
-      io.emit("show-action", { ...msg, ts: Date.now() });
-      return;
-    }
-
-    io.emit("show-action", { ...msg, ts: Date.now() });
-    scheduleSave();
   });
 });
 
-
-setInterval(() => {
-  const now = Date.now();
-  for (const [token, p] of players) {
-    if (now - p.lastActivity > 2 * 60 * 60 * 1000) {
-      players.delete(token);
-    }
-  }
-  scheduleSave();
-}, 60_000);
-
-
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => {
-  console.log(`🚀 Socket.IO running on ${PORT}`);
-});
+server.listen(process.env.PORT || 4000, () =>
+  console.log("🚀 Socket.IO running")
+);
