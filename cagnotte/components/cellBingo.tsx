@@ -351,6 +351,15 @@ export default function BingoBoard() {
   }, [completedLines]);
 
   const toggleCell = (row: number, col: number) => {
+    const key: CellKey = `${row}-${col}`;
+
+    // 🔥 UI OPTIMISTE (réactivité immédiate)
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+
     socket.emit("show-action", {
       type: "toggle-cell",
       row,
