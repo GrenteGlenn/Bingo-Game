@@ -127,6 +127,12 @@ function emitPlayerState(socket, token) {
 
 
 io.on("connection", (socket) => {
+    const token = socket.handshake.auth?.token;
+
+  if (token) {
+    emitPlayerState(socket, token); // ✅ envoi immédiat de la grille
+    scheduleSave();
+  }
   socket.emit("show-action", {
     type: "cagnotte-update",
     points: cagnottePoints,
