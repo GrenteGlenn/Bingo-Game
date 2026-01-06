@@ -58,7 +58,7 @@ export default function Page() {
       <div
         className="
     absolute
-    bottom-[3%]
+    bottom-[10%]
     left-1/2
     -translate-x-1/2
     z-10
