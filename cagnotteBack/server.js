@@ -129,6 +129,20 @@ io.on("connection", (socket) => {
     if (!token) return;
     emitPlayerState(socket, token);
   });
+  socket.on("request-full-state", () => {
+    drawnNumbers.forEach((n) => {
+      socket.emit("show-action", {
+        type: "number",
+        value: n,
+        ts: Date.now(),
+      });
+    });
+
+    socket.emit("show-action", {
+      type: "cagnotte-update",
+      points: cagnottePoints,
+    });
+  });
 
   socket.on("show-action", (msg) => {
     if (msg.type === "toggle-cell") {
