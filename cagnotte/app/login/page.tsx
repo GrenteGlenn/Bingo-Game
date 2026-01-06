@@ -87,7 +87,7 @@ export default function Page() {
       <img
         src="/images/voeux.png"
         alt="Voeux RTE 2026"
-        className="mt-10 w-[200px] h-auto"
+        className="mt-10 w-[500px] h-auto"
       />
       <div className=" pb-4 pointer-events-none">
         <img src="/images/RTE_logo.png" alt="RTE" className="h-28 opacity-90" />

@@ -6,6 +6,7 @@ const fs = require("fs");
 
 const STATE_FILE = "./state.json";
 
+
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -14,7 +15,6 @@ function shuffle(array) {
   return array;
 }
 
-// 25 nombres UNIQUES entre 1 et 50
 function drawUniqueNumbers(min, max, count) {
   const pool = [];
   for (let n = min; n <= max; n++) pool.push(n);
@@ -32,20 +32,17 @@ const io = new Server(server, {
   cors: { origin: "*", methods: ["GET", "POST"] },
 });
 
+
 let cagnottePoints = 0;
 let drawnNumbers = [];
-let cagnotteState = null;
-
-// joueurs par token
 const players = new Map();
+
 
 if (fs.existsSync(STATE_FILE)) {
   try {
     const data = JSON.parse(fs.readFileSync(STATE_FILE, "utf-8"));
-
     cagnottePoints = data.cagnottePoints ?? 0;
     drawnNumbers = data.drawnNumbers ?? [];
-    cagnotteState = data.cagnotteState ?? null;
 
     data.players?.forEach((p) => {
       players.set(p.token, {
@@ -63,6 +60,7 @@ if (fs.existsSync(STATE_FILE)) {
   }
 }
 
+
 let saveTimeout = null;
 
 function scheduleSave() {
@@ -72,7 +70,6 @@ function scheduleSave() {
     const data = {
       cagnottePoints,
       drawnNumbers,
-      cagnotteState,
       players: [...players.entries()].map(([token, p]) => ({
         token,
         numbers: p.numbers,
@@ -88,6 +85,7 @@ function scheduleSave() {
   }, 500);
 }
 
+
 function getPlayer(token) {
   if (!players.has(token)) {
     players.set(token, {
@@ -98,7 +96,6 @@ function getPlayer(token) {
       lastActivity: Date.now(),
     });
   }
-
   const player = players.get(token);
   player.lastActivity = Date.now();
   return player;
@@ -112,11 +109,9 @@ function countCompletedLines(selected) {
   for (let r = 0; r < rows; r++) {
     if ([...Array(cols)].every((_, c) => selected.has(`${r}-${c}`))) count++;
   }
-
   for (let c = 0; c < cols; c++) {
     if ([...Array(rows)].every((_, r) => selected.has(`${r}-${c}`))) count++;
   }
-
   return count;
 }
 
@@ -130,21 +125,37 @@ function emitPlayerState(socket, token) {
   });
 }
 
+
 io.on("connection", (socket) => {
-  /* --- sync global --- */
   socket.emit("show-action", {
     type: "cagnotte-update",
     points: cagnottePoints,
     ts: Date.now(),
   });
 
-  drawnNumbers.forEach((n) =>
-    socket.emit("show-action", { type: "number", value: n, ts: Date.now() })
-  );
+  drawnNumbers.forEach((n) => {
+    socket.emit("show-action", {
+      type: "number",
+      value: n,
+      ts: Date.now(),
+    });
+  });
 
-  if (cagnotteState) {
-    socket.emit("show-action", { ...cagnotteState, ts: Date.now() });
-  }
+  socket.on("request-full-state", () => {
+    drawnNumbers.forEach((n) => {
+      socket.emit("show-action", {
+        type: "number",
+        value: n,
+        ts: Date.now(),
+      });
+    });
+
+    socket.emit("show-action", {
+      type: "cagnotte-update",
+      points: cagnottePoints,
+      ts: Date.now(),
+    });
+  });
 
   socket.on("request-player-state", ({ token }) => {
     if (!token) return;
@@ -153,7 +164,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("show-action", (msg) => {
-    /* 🎯 TOGGLE CELL */
     if (msg.type === "toggle-cell") {
       const { token, row, col } = msg;
       if (!token) return;
@@ -192,43 +202,14 @@ io.on("connection", (socket) => {
         ts: Date.now(),
       });
 
-      // renvoie l’état du joueur (utile si multi-tabs / resync)
       emitPlayerState(socket, token);
-
       scheduleSave();
       return;
     }
-    socket.on("request-full-state", () => {
-      // renvoi tous les numéros déjà tirés
-      drawnNumbers.forEach((n) => {
-        socket.emit("show-action", {
-          type: "number",
-          value: n,
-          ts: Date.now(),
-        });
-      });
 
-      // état cagnotte
-      socket.emit("show-action", {
-        type: "cagnotte-update",
-        points: cagnottePoints,
-        ts: Date.now(),
-      });
-
-      // état spécial (palier / félicitation)
-      if (cagnotteState) {
-        socket.emit("show-action", {
-          ...cagnotteState,
-          ts: Date.now(),
-        });
-      }
-    });
-
-    /*  RESET GLOBAL */
     if (msg.type === "reset-bingo") {
       players.clear();
       drawnNumbers = [];
-      cagnotteState = null;
       cagnottePoints = 0;
 
       scheduleSave();
@@ -243,17 +224,21 @@ io.on("connection", (socket) => {
     }
 
     if (msg.type === "number") {
-      if (!drawnNumbers.includes(msg.value)) drawnNumbers.push(msg.value);
+      if (!drawnNumbers.includes(msg.value)) {
+        drawnNumbers.push(msg.value);
+      }
     }
 
     if (msg.type === "palier" || msg.type === "felicitation") {
-      cagnotteState = msg;
+      io.emit("show-action", { ...msg, ts: Date.now() });
+      return;
     }
 
     io.emit("show-action", { ...msg, ts: Date.now() });
     scheduleSave();
   });
 });
+
 
 setInterval(() => {
   const now = Date.now();
@@ -264,6 +249,7 @@ setInterval(() => {
   }
   scheduleSave();
 }, 60_000);
+
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {

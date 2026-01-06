@@ -55,11 +55,25 @@ export default function Page() {
         style={{ backgroundImage: "url('/images/podium6.webp')" }}
       />
 
-      <div className="absolute bottom-50 left-1/2 transform -translate-x-2/4 z-10">
-        <img src="/images/voeux.png" alt="" />
+      <div
+        className="
+    absolute
+    bottom-[3%]
+    left-1/2
+    -translate-x-1/2
+    z-10
+    w-[70%]
+    max-w-[900px]
+  "
+      >
+        <img
+          src="/images/voeux.png"
+          alt="Vœux RTE 2026"
+          className="w-full h-auto"
+        />
       </div>
 
-      <span className="absolute bottom-50 left-1/2 transform -translate-x-2/4 z-10 text-white">
+      <span className="absolute bottom-48 left-1/2 transform -translate-x-2/4 z-10 text-white text-3xl">
         15 janvier
       </span>
 

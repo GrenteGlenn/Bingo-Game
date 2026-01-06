@@ -11,7 +11,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   if (!socketRef.current) {
     socketRef.current = io(process.env.NEXT_PUBLIC_SOCKET_URL!, {
       path: "/socket.io",
-      transports: ["websocket"], // ❌ retire polling
+      transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: Infinity,
     });

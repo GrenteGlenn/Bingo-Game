@@ -27,7 +27,7 @@ export default function DisplayScreen() {
           />
         </div>
 
-        <div className="text-white text-lg md:text-3xl font-semibold text-center mb-6">
+        <div className="text-white text-lg md:text-3xl font-semibold text-center mb-6 mt-10">
           Numéros tirés
         </div>
 
@@ -52,9 +52,7 @@ export default function DisplayScreen() {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-60 left-1/2 transform -translate-x-2/4 z-10">
-        <img src="/images/voeux.png" alt="" />
-      </div>
+   
       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
         <img
           src="/images/RTE_logo.png"
@@ -66,9 +64,6 @@ export default function DisplayScreen() {
           "
         />
       </div>
-      <span className="absolute bottom-50 left-1/2 transform -translate-x-2/4 z-10 text-white">
-        15 janvier
-      </span>
     </div>
   );
 }
