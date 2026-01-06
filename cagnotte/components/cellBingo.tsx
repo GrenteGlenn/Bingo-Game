@@ -277,6 +277,7 @@ export default function BingoBoard() {
   const [numbers, setNumbers] = useState<number[]>([]);
   const [selected, setSelected] = useState<Set<CellKey>>(new Set());
   const [ready, setReady] = useState(false);
+  const hasHydratedRef = useRef(false);
 
   const [showBingo, setShowBingo] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -310,12 +311,26 @@ export default function BingoBoard() {
 
     const handler = (msg: any) => {
       if (msg.type === "player-state") {
+        const selectedSet = new Set<CellKey>(msg.selected);
+
         setNumbers(msg.numbers);
-        setSelected(new Set(msg.selected));
+        setSelected(selectedSet);
         setReady(true);
+
+        // 🧠 PREMIÈRE SYNC → PAS DE BINGO
+        if (!hasHydratedRef.current) {
+          prevLineCountRef.current = countCompletedLines(
+            selectedSet,
+            rows,
+            cols
+          );
+          hasHydratedRef.current = true;
+        }
       }
 
       if (msg.type === "reset-bingo") {
+        hasHydratedRef.current = false;
+
         clearTimers();
         prevLineCountRef.current = 0;
 
@@ -348,6 +363,8 @@ export default function BingoBoard() {
   const completedLines = countCompletedLines(selected, rows, cols);
 
   useEffect(() => {
+    if (!hasHydratedRef.current) return;
+
     if (completedLines > prevLineCountRef.current) {
       triggerBingoFx();
     }
