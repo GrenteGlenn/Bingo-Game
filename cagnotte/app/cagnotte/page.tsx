@@ -63,7 +63,7 @@ export default function Page() {
     -translate-x-1/2
     z-10
     w-[70%]
-    max-w-[900px]
+    max-w-[700px]
   "
       >
         <img

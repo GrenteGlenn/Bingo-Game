@@ -306,57 +306,56 @@ export default function BingoBoard() {
   };
 
   // listener socket
-  useEffect(() => {
-    if (!socket) return;
+ useEffect(() => {
+  if (!socket || !token) return;
 
-    const handler = (msg: any) => {
-      if (msg.type === "player-state") {
-        const selectedSet = new Set<CellKey>(msg.selected);
+  const handler = (msg: any) => {
+    if (msg.type === "player-state") {
+      const selectedSet = new Set<CellKey>(msg.selected);
 
-        setNumbers(msg.numbers);
-        setSelected(selectedSet);
-        setReady(true);
+      setNumbers(msg.numbers);
+      setSelected(selectedSet);
+      setReady(true);
 
-        // 🧠 PREMIÈRE SYNC → PAS DE BINGO
-        if (!hasHydratedRef.current) {
-          prevLineCountRef.current = countCompletedLines(
-            selectedSet,
-            rows,
-            cols
-          );
-          hasHydratedRef.current = true;
-        }
+      if (!hasHydratedRef.current) {
+        prevLineCountRef.current = countCompletedLines(
+          selectedSet,
+          rows,
+          cols
+        );
+        hasHydratedRef.current = true;
       }
+    }
 
-      if (msg.type === "reset-bingo") {
-        hasHydratedRef.current = false;
+    if (msg.type === "reset-bingo") {
+      hasHydratedRef.current = false;
+      prevLineCountRef.current = 0;
 
-        clearTimers();
-        prevLineCountRef.current = 0;
+      clearTimers();
+      setReady(false);
+      setNumbers([]);
+      setSelected(new Set());
 
-        setNumbers([]);
-        setSelected(new Set());
-        setReady(false);
+      socket.emit("request-player-state", { token });
+    }
+  };
 
-        // 🔥 REDEMANDE IMMÉDIATEMENT UNE NOUVELLE GRILLE
-        socket.emit("request-player-state", { token });
-      }
-    };
+  socket.on("show-action", handler);
 
-    socket.on("show-action", handler);
-
-    return () => {
-      socket.off("show-action", handler);
-    };
-  }, [socket]);
+  return () => {
+    socket.off("show-action", handler);
+  };
+}, [socket, token]);
 
   // demande initiale
   useEffect(() => {
     if (!socket || !token) return;
 
-    const request = () => socket.emit("request-player-state", { token });
+    const request = () => {
+      socket.emit("request-player-state", { token });
+    };
 
-    socket.connected ? request() : socket.once("connect", request);
+    request(); // 🔥 TOUJOURS
   }, [socket, token]);
 
   // 🎯 DÉTECTION BINGO
