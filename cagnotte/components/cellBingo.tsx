@@ -318,9 +318,13 @@ export default function BingoBoard() {
       if (msg.type === "reset-bingo") {
         clearTimers();
         prevLineCountRef.current = 0;
+
         setNumbers([]);
         setSelected(new Set());
         setReady(false);
+
+        // 🔥 REDEMANDE IMMÉDIATEMENT UNE NOUVELLE GRILLE
+        socket.emit("request-player-state", { token });
       }
     };
 

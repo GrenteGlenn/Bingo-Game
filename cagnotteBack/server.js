@@ -185,7 +185,16 @@ io.on("connection", (socket) => {
       players.clear();
       drawnNumbers = [];
       cagnottePoints = 0;
+
       io.emit("show-action", { type: "reset-bingo" });
+
+      // 🔥 OPTIONNEL : renvoi auto après reset
+      for (const socketId of io.sockets.sockets.keys()) {
+        const s = io.sockets.sockets.get(socketId);
+        const token = s.handshake.auth?.token;
+        if (token) emitPlayerState(s, token);
+      }
+
       scheduleSave();
     }
   });
