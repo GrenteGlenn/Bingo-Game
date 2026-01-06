@@ -157,7 +157,15 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // 🔢 NUMÉRO TIRÉ (⬅️ IL MANQUAIT CELUI-LÀ)
+    if (msg.type === "palier" || msg.type === "felicitation") {
+      io.emit("show-action", {
+        ...msg,
+        ts: Date.now(),
+      });
+
+      return;
+    }
+
     if (msg.type === "number") {
       if (!drawnNumbers.includes(msg.value)) {
         drawnNumbers.push(msg.value);
