@@ -78,15 +78,11 @@ function scheduleSave() {
       })),
     };
 
-    fs.writeFileSync(
-      STATE_FILE,
-      JSON.stringify(data, null, 2)
-    );
+    fs.writeFileSync(STATE_FILE, JSON.stringify(data, null, 2));
 
     saveTimeout = null;
   }, 500);
 }
-
 
 /* ---------- HELPERS ---------- */
 function getPlayer(token) {
@@ -143,6 +139,22 @@ io.on("connection", (socket) => {
       p.selected.has(key) ? p.selected.delete(key) : p.selected.add(key);
 
       emitPlayerState(socket, token);
+      scheduleSave();
+      return;
+    }
+
+    // 🔢 NUMÉRO TIRÉ (⬅️ IL MANQUAIT CELUI-LÀ)
+    if (msg.type === "number") {
+      if (!drawnNumbers.includes(msg.value)) {
+        drawnNumbers.push(msg.value);
+      }
+
+      io.emit("show-action", {
+        type: "number",
+        value: msg.value,
+        ts: Date.now(),
+      });
+
       scheduleSave();
       return;
     }
