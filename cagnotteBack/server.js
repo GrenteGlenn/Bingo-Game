@@ -143,16 +143,29 @@ io.on("connection", (socket) => {
       return;
     }
 
+    // if (msg.type === "reset-bingo") {
+    //   players.clear();
+
+    //   // ⚠️ recrée les grilles pour TOUS les sockets connectés
+    //   for (const s of io.sockets.sockets.values()) {
+    //     const t = s.handshake.auth?.token;
+    //     if (t) emitPlayerState(s, t);
+    //   }
+
+    //   io.emit("show-action", { type: "reset-bingo" });
+    //   scheduleSave();
+    //   return;
+    // }
+
     if (msg.type === "reset-bingo") {
       players.clear();
 
-      // ⚠️ recrée les grilles pour TOUS les sockets connectés
-      for (const s of io.sockets.sockets.values()) {
-        const t = s.handshake.auth?.token;
-        if (t) emitPlayerState(s, t);
-      }
-
+      // 1️⃣ informer tout le monde du reset
       io.emit("show-action", { type: "reset-bingo" });
+
+      // 2️⃣ NE PAS recréer les grilles ici
+      // elles seront recréées à la demande client
+
       scheduleSave();
       return;
     }
@@ -161,7 +174,11 @@ io.on("connection", (socket) => {
       if (!drawnNumbers.includes(msg.value)) {
         drawnNumbers.push(msg.value);
       }
-      io.emit("show-action", { type: "number", value: msg.value, ts: Date.now() });
+      io.emit("show-action", {
+        type: "number",
+        value: msg.value,
+        ts: Date.now(),
+      });
       scheduleSave();
     }
 
@@ -170,7 +187,6 @@ io.on("connection", (socket) => {
     }
   });
 });
-
 
 server.listen(process.env.PORT || 4000, () =>
   console.log("🚀 Socket.IO running")

@@ -306,19 +306,18 @@ export default function BingoBoard() {
   };
 
   useEffect(() => {
-  if (!socket || !token) return;
+    if (!socket || !token) return;
 
-  const request = () => {
-    socket.emit("request-player-state", { token });
-  };
+    const request = () => {
+      socket.emit("request-player-state", { token });
+    };
 
-  if (socket.connected) {
-    request();
-  } else {
-    socket.once("connect", request);
-  }
-}, [socket, token]);
-
+    if (socket.connected) {
+      request();
+    } else {
+      socket.once("connect", request);
+    }
+  }, [socket, token]);
 
   // listener socket
   useEffect(() => {
@@ -350,6 +349,9 @@ export default function BingoBoard() {
         setReady(false);
         setNumbers([]);
         setSelected(new Set());
+
+        // 🔥 DEMANDE EXPLICITE D’UNE NOUVELLE GRILLE
+        socket.emit("request-player-state", { token });
       }
     };
 
