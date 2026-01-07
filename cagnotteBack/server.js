@@ -42,7 +42,6 @@ function countCompletedLines(selected) {
   return count;
 }
 
-
 /* ---------- APP ---------- */
 const app = express();
 app.use(cors());
@@ -200,6 +199,24 @@ io.on("connection", (socket) => {
 
       // 🔥 EMISSIONS LIVE
       emitPlayerState(socket, token);
+
+      io.emit("show-action", {
+        type: "cagnotte-update",
+        points: cagnottePoints,
+        ts: Date.now(),
+      });
+
+      scheduleSave();
+      return;
+    }
+
+    if (msg.type === "reset-score") {
+      cagnottePoints = 0;
+
+      for (const p of players.values()) {
+        p.completedLines = 0;
+        p.isFull = false;
+      }
 
       io.emit("show-action", {
         type: "cagnotte-update",
