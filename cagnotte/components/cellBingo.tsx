@@ -305,6 +305,21 @@ export default function BingoBoard() {
     );
   };
 
+  useEffect(() => {
+  if (!socket || !token) return;
+
+  const request = () => {
+    socket.emit("request-player-state", { token });
+  };
+
+  if (socket.connected) {
+    request();
+  } else {
+    socket.once("connect", request);
+  }
+}, [socket, token]);
+
+
   // listener socket
   useEffect(() => {
     if (!socket) return;

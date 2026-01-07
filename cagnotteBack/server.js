@@ -112,13 +112,13 @@ function emitPlayerState(socket, token) {
 
 /* ---------- SOCKET ---------- */
 io.on("connection", (socket) => {
-  const token = socket.handshake.auth?.token;
+  // const token = socket.handshake.auth?.token;
 
-  if (token) {
-    // ✅ CRÉATION OU RÉCUPÉRATION DU JOUEUR
-    emitPlayerState(socket, token);
-    scheduleSave();
-  }
+  // if (token) {
+  //   // ✅ CRÉATION OU RÉCUPÉRATION DU JOUEUR
+  //   emitPlayerState(socket, token);
+  //   scheduleSave();
+  // }
 
   socket.emit("show-action", {
     type: "cagnotte-update",

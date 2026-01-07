@@ -1,5 +1,42 @@
 {
   "cagnottePoints": 0,
-  "drawnNumbers": [],
-  "players": []
+  "drawnNumbers": [
+    7,
+    6
+  ],
+  "players": [
+    {
+      "token": "487d8a0d-8e4f-4508-bc32-ea8882f7615c",
+      "numbers": [
+        1,
+        34,
+        7,
+        28,
+        11,
+        9,
+        37,
+        4,
+        20,
+        43,
+        48,
+        8,
+        18,
+        2,
+        46,
+        13,
+        27,
+        41,
+        39,
+        16,
+        40,
+        47,
+        38,
+        26,
+        22
+      ],
+      "selected": [],
+      "completedLines": 0,
+      "isFull": false
+    }
+  ]
 }
