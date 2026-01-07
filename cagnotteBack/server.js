@@ -22,6 +22,27 @@ function drawUniqueNumbers(min, max, count) {
   return pool.slice(0, count);
 }
 
+function countCompletedLines(selected) {
+  const rows = 5;
+  const cols = 5;
+  let count = 0;
+
+  for (let r = 0; r < rows; r++) {
+    if ([...Array(cols)].every((_, c) => selected.has(`${r}-${c}`))) {
+      count++;
+    }
+  }
+
+  for (let c = 0; c < cols; c++) {
+    if ([...Array(rows)].every((_, r) => selected.has(`${r}-${c}`))) {
+      count++;
+    }
+  }
+
+  return count;
+}
+
+
 /* ---------- APP ---------- */
 const app = express();
 app.use(cors());
