@@ -131,14 +131,61 @@ io.on("connection", (socket) => {
   });
 
   socket.on("show-action", (msg) => {
+    // if (msg.type === "toggle-cell") {
+    //   const { token, row, col } = msg;
+    //   const p = getPlayer(token);
+    //   const key = `${row}-${col}`;
+
+    //   p.selected.has(key) ? p.selected.delete(key) : p.selected.add(key);
+
+    //   emitPlayerState(socket, token);
+    //   scheduleSave();
+    //   return;
+    // }
+
     if (msg.type === "toggle-cell") {
       const { token, row, col } = msg;
       const p = getPlayer(token);
       const key = `${row}-${col}`;
 
-      p.selected.has(key) ? p.selected.delete(key) : p.selected.add(key);
+      // 🔢 +12 / -12 points par case
+      if (p.selected.has(key)) {
+        p.selected.delete(key);
+        cagnottePoints -= 12;
+      } else {
+        p.selected.add(key);
+        cagnottePoints += 12;
+      }
 
+      // 🎯 lignes complétées
+      const newLines = countCompletedLines(p.selected);
+      const diff = newLines - p.completedLines;
+
+      if (diff !== 0) {
+        cagnottePoints += diff * 30; // +30 par ligne
+        p.completedLines = newLines;
+      }
+
+      // 🏆 grille complète
+      const isFull = p.selected.size === 25;
+      if (isFull && !p.isFull) {
+        cagnottePoints += 100;
+        p.isFull = true;
+      }
+      if (!isFull && p.isFull) {
+        cagnottePoints -= 100;
+        p.isFull = false;
+      }
+
+      // 🔥 EMISSIONS LIVE
       emitPlayerState(socket, token);
+
+      io.emit("show-action", {
+        type: "cagnotte-update",
+        points: cagnottePoints,
+        ts: Date.now(),
+      });
+
       scheduleSave();
       return;
     }
