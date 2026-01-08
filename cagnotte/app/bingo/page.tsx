@@ -29,18 +29,29 @@ export default function bingo() {
     to-[rgba(0,166,217,0.3)]
   "
     >
+      <div >
+        <img
+          className="h-20 mx-auto"
+          src="/images/bingoOr3.png"
+          alt="Bingo en Or"
+        />
+      </div>
       <div>
-        <img className="h-50" src="/images/bingoOr.png" alt="Bingo en Or" />
+        <img
+          className="h-20 mx-auto mb-10"
+          src="/images/bingoOr4.png"
+          alt="Bingo en Or"
+        />
       </div>
       <div className="flex self-start flex-row">
         <span className="font-semibold mt-0.5 text-white">{playerName}</span>
       </div>
       <CellBingo />
-      <div className="">
+      <div className="h-1/2">
         <img
-          src="/images/RTE_logo.png"
+          src="/images/RTE.png"
           alt="RTE"
-          className="h-50 md:h-50 lg:h-50 opacity-90"
+          className="h-full md:h-80 lg:h-80 opacity-90"
         />
       </div>
     </div>

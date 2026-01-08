@@ -52,38 +52,22 @@ export default function Page() {
 
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-        style={{ backgroundImage: "url('/images/podium6.webp')" }}
+        style={{ backgroundImage: "url('/images/imageCagnotte.jpg')" }}
       />
 
-      <div
-        className="
-    absolute
-    bottom-[10%]
-    left-1/2
-    -translate-x-1/2
-    z-10
-    w-[70%]
-    max-w-[700px]
-  "
+      <span
+        className="absolute bottom-55 left-1/2 -translate-x-1/2 z-10 text-[#00A6D9] text-5xl"
+        style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
       >
-        <img
-          src="/images/voeux.png"
-          alt="Vœux RTE 2026"
-          className="w-full h-auto"
-        />
-      </div>
-
-      <span className="absolute bottom-48 left-1/2 transform -translate-x-2/4 z-10 text-white text-3xl">
-        15 janvier
+        Voeux window 2026
       </span>
 
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
-        <img
-          src="/images/RTE_logo.png"
-          alt="RTE"
-          className="h-20 md:h-24 lg:h-28 opacity-90 drop-shadow-[0_6px_20px_rgba(0,0,0,0.35)]"
-        />
-      </div>
+      <span
+        className="absolute bottom-45 left-1/2 -translate-x-1/2 z-10 text-[#00A6D9] text-3xl"
+        style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+      >
+        15 janvier 2026
+      </span>
 
       {lastMsg && (
         <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
@@ -105,10 +89,16 @@ export default function Page() {
         </div>
       )}
 
-      <div className="absolute bottom-[25%] left-3 z-10 w-full h-11/12">
+      <div className="absolute bottom-[20%] left-3 z-10 w-full h-11/12">
         <Cagnotte3D />
       </div>
-    
+      <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 z-10">
+        <img
+          src="/images/RTE.png"
+          alt="RTE"
+          className="h-20 md:h-24 lg:h-65  "
+        />
+      </span>
     </main>
   );
 }

@@ -10,18 +10,18 @@ export default function Page() {
 
   const isValidName = (value: string) => /^[a-zA-ZÀ-ÿ\s-]+$/.test(value.trim());
 
- const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const trimmed = name.trim();
-  if (!trimmed || !isValidName(trimmed)) return;
+    const trimmed = name.trim();
+    if (!trimmed || !isValidName(trimmed)) return;
 
-  sessionStorage.setItem("playerName", trimmed);
+    sessionStorage.setItem("playerName", trimmed);
 
-  getPlayerToken();
+    getPlayerToken();
 
-  router.push("/bingo");
-};
+    router.push("/bingo");
+  };
   return (
     <div
       className="
@@ -35,11 +35,20 @@ export default function Page() {
   "
     >
       <div className="mt-6 mb-6">
-        <img
-          src="/images/bingoOr.png"
-          alt="Bingo en Or"
-          className="h-40 md:h-48"
-        />
+       <div>
+          <img
+            className="h-20 mx-auto"
+            src="/images/bingoOr3.png"
+            alt="Bingo en Or"
+          />
+        </div>
+        <div>
+          <img
+            className="h-20 mx-auto mb-10"
+            src="/images/bingoOr4.png"
+            alt="Bingo en Or"
+          />
+        </div>
       </div>
 
       <form
@@ -84,13 +93,33 @@ export default function Page() {
         </button>
       </form>
 
-      <img
-        src="/images/voeux.png"
-        alt="Voeux RTE 2026"
-        className="mt-10 w-[500px] h-auto"
-      />
-      <div className=" pb-4 pointer-events-none">
-        <img src="/images/RTE_logo.png" alt="RTE" className="h-28 opacity-90" />
+      <div className="relative mt-36 pb-4 pointer-events-none flex flex-col items-center">
+        {/* TEXTE AU-DESSUS */}
+        <div
+          className="
+      absolute
+      -top-10
+      left-1/2
+      -translate-x-1/2
+      text-white
+      text-4xl
+      md:text-3xl
+      font-semibold
+      z-10
+      text-center
+      whitespace-nowrap
+    "
+    
+        >
+          Voeux window 2026
+        </div>
+
+        {/* LOGO RTE */}
+        <img
+          src="/images/RTE.png"
+          alt="RTE"
+          className="h-50 md:h-72 lg:h-70 opacity-90"
+        />
       </div>
     </div>
   );
