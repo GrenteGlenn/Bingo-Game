@@ -12,19 +12,7 @@ export default function Affichage() {
         <DisplayScreen />
       </div>
 
-      <div
-        className="
-          absolute
-          top-[20%] left-4
-          -translate-y-1/2
-          z-20
-          w-[220px]
-          md:w-[280px]
-          lg:w-[300px]
-        "
-      >
-        <img src="/images/qrcode2.png" alt="QR Code" />
-      </div>
+    
 
       <footer
         className="
