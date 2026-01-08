@@ -15,7 +15,7 @@ export default function Affichage() {
       <div
         className="
           absolute
-          top-1/2 left-4
+          top-[20%] left-4
           -translate-y-1/2
           z-20
           w-[220px]

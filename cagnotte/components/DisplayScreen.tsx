@@ -40,7 +40,7 @@ export default function DisplayScreen() {
         </div>
 
         <div className="rounded-2xl p-3 md:p-4 ">
-          <div className="grid gap-6 grid-cols-5 sm:grid-cols-8 md:grid-cols-10">
+          <div className="grid gap-3 grid-cols-5 sm:grid-cols-8 md:grid-cols-10 mx-auto">
             {values.map((num, index) => (
               <div
                 key={`${num}-${index}`}

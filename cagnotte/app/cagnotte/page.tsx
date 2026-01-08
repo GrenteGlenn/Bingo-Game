@@ -52,7 +52,7 @@ export default function Page() {
 
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-        style={{ backgroundImage: "url('/images/imageCagnotte.jpg')" }}
+        style={{ backgroundImage: "url('/images/affichage.png')" }}
       />
 
       <span
@@ -66,7 +66,7 @@ export default function Page() {
         className="absolute bottom-45 left-1/2 -translate-x-1/2 z-10 text-[#00A6D9] text-3xl"
         style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
       >
-        15 janvier 2026
+        15 janvier
       </span>
 
       {lastMsg && (
