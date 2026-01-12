@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useShowChannel } from "@/lib/show-channel";
 
+const ALL_NUMBERS = Array.from({ length: 50 }, (_, i) => i + 1);
+
 export default function DisplayScreen() {
   const [values, setValues] = useState<number[]>([]);
 
@@ -17,56 +19,64 @@ export default function DisplayScreen() {
   });
 
   return (
-    <div className="relative w-full flex justify-center">
-      <div className="w-full max-w-7xl">
-        <div className="flex justify-center">
-          <img
-            className="h-64 md:h-64 lg:h-80"
-            src="/images/BINGOENOR.png"
-            alt="Bingo en Or"
-          />
-        </div>
+    <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-12 px-6 py-5 ">
+      <div className="flex flex-col items-center lg:items-center w-full lg:w-2/3">
+        {/* Logo */}
+        <img
+          src="/images/BINGOENOR.png"
+          alt="Bingo en Or"
+          className="w-full max-w-md md:max-w-xl lg:max-w-4xl object-contain -mt-6 md:-mt-2 lg:-mt-65"
+        />
+
+        {/* QR Code */}
+        <img
+          src="/images/qrcode.png"
+          alt="QR Code"
+          className=" w-40 md:w-48 lg:w-64 object-contain -mt-12 lg:-mt-30 "
+        />
+      </div>
+
+      {/* NUMÉROS */}
+      <div className="flex flex-col border border-white rounded-lg px-6 md:px-12 py-3 lg:mt-3 w-full max-w-3xl ">
+        <h1 className="text-2xl md:text-5xl text-white font-bold text-center mb-5"
+          style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
+          Numéros Tirés
+        </h1>
 
         <div
           className="
-            absolute
-            top-[5%]
-            left-2
-            z-20
-            w-[160px]
-            sm:w-[200px]
-            md:w-[240px]
-            lg:w-[250px]
-          "
+          grid
+          grid-cols-5
+          sm:grid-cols-6
+          md:grid-cols-8
+          lg:grid-cols-7
+          gap-4 md:gap-3
+          justify-items-center
+        
+        "
         >
-          <img src="/images/qrcode2.png" alt="QR Code" />
-        </div>
+          {ALL_NUMBERS.map((num) => {
+            const isActive = values.includes(num);
 
-        <div
-          className="
-            rounded-2xl
-            p-3 md:p-2
-            pl-[100px]
-            sm:pl-[200px]
-            md:pl-[200px]
-            lg:pl-[50px]
-          "
-        >
-          <div className="grid gap-6 grid-cols-5 sm:grid-cols-8 md:grid-cols-10 ">
-            {values.map((num, index) => (
+            return (
               <div
-                key={`${num}-${index}`}
-                className="flex items-center justify-center font-bold text-white"
-                style={{
-                  fontFamily: "Arial, Helvetica, sans-serif",
-                  fontSize: "clamp(1.6rem, 3.5vw, 5.5rem)",
-                  lineHeight: 1,
-                }}
+                key={num}
+                className={`
+                  flex items-center justify-center
+                  rounded-full font-bold
+                  transition-colors duration-300
+                  w-12 h-12
+                  sm:w-14 sm:h-14
+                  md:w-16 md:h-16
+                  lg:w-18 lg:h-18
+                  ${isActive ? "bg-blue-600 text-white" : "bg-white text-black"}
+                `}
+                style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
               >
                 {num}
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </div>
     </div>

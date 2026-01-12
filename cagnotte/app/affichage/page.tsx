@@ -11,6 +11,8 @@ export default function Affichage() {
       <div className="absolute inset-0 z-10">
         <DisplayScreen />
       </div>
+       {/* QR CODE */}
+       
     </main>
   );
 }
