@@ -54,21 +54,28 @@ export default function Page() {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
         style={{ backgroundImage: "url('/images/affichage.png')" }}
       />
-
-      <span
-        className="absolute bottom-55 left-1/2 -translate-x-1/2 z-10 text-[#00A6D9] text-5xl"
-        style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
-      >
-        Voeux window 2026
+        <span className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10">
+        <img
+          src="/images/RTE.png"
+          alt="RTE"
+          className="h-20 md:h-24 lg:h-65  "
+        />
       </span>
 
       <span
-        className="absolute bottom-45 left-1/2 -translate-x-1/2 z-10 text-[#00A6D9] text-3xl"
+        className="absolute bottom-25 left-1/2 -translate-x-1/2 z-10 text-black text-5xl"
         style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
       >
-        15 janvier
+        VOEUX WINDOW 2026
       </span>
 
+      <span
+        className="absolute bottom-15 left-1/2 -translate-x-1/2 z-10 text-black text-3xl"
+        style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+      >
+        15 JANVIER
+      </span>
+     
       {lastMsg && (
         <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
           <div className="text-center">
@@ -91,14 +98,7 @@ export default function Page() {
 
       <div className="absolute bottom-[20%] left-3 z-10 w-full h-11/12">
         <Cagnotte3D />
-      </div>
-      <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 z-10">
-        <img
-          src="/images/RTE.png"
-          alt="RTE"
-          className="h-20 md:h-24 lg:h-65  "
-        />
-      </span>
+      </div>      
     </main>
   );
 }

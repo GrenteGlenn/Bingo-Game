@@ -35,20 +35,11 @@ export default function Page() {
   "
     >
       <div className="mt-6 mb-6">
-       <div>
-          <img
-            className="h-20 mx-auto"
-            src="/images/bingoOr3.png"
-            alt="Bingo en Or"
-          />
-        </div>
-        <div>
-          <img
-            className="h-20 mx-auto mb-10"
-            src="/images/bingoOr4.png"
-            alt="Bingo en Or"
-          />
-        </div>
+        <img
+          className="h-64 md:h-64 lg:h-84"
+          src="/images/BINGOENOR.png"
+          alt="Bingo en Or"
+        />
       </div>
 
       <form
@@ -94,14 +85,13 @@ export default function Page() {
       </form>
 
       <div className="relative mt-36 pb-4 pointer-events-none flex flex-col items-center">
-        {/* TEXTE AU-DESSUS */}
         <div
           className="
       absolute
       -top-10
       left-1/2
       -translate-x-1/2
-      text-white
+      text-black
       text-4xl
       md:text-3xl
       font-semibold
@@ -109,9 +99,8 @@ export default function Page() {
       text-center
       whitespace-nowrap
     "
-    
         >
-          Voeux window 2026
+          VOEUX WINDOW 2026
         </div>
 
         {/* LOGO RTE */}

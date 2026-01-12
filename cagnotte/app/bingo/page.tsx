@@ -22,27 +22,18 @@ export default function bingo() {
   return (
     <div
       className="
-    flex flex-col items-center p-4 gap-3 min-h-screen
+    flex flex-col items-center px-8 gap-3 min-h-screen
     bg-gradient-to-b
     from-[#00A6D9]
     via-[rgba(0,166,217,0.5)]
     to-[rgba(0,166,217,0.3)]
   "
     >
-      <div >
-        <img
-          className="h-20 mx-auto"
-          src="/images/bingoOr3.png"
-          alt="Bingo en Or"
-        />
-      </div>
-      <div>
-        <img
-          className="h-20 mx-auto mb-10"
-          src="/images/bingoOr4.png"
-          alt="Bingo en Or"
-        />
-      </div>
+      <img
+        className="h-64 "
+        src="/images/BINGOENOR.png"
+        alt="Bingo en Or"
+      />
       <div className="flex self-start flex-row">
         <span className="font-semibold mt-0.5 text-white">{playerName}</span>
       </div>
