@@ -103,7 +103,7 @@ export default function Page() {
           VOEUX WINDOW 2026
         </div>
 
-        {/* LOGO RTE */}
+      
         <img
           src="/images/RTE.png"
           alt="RTE"
