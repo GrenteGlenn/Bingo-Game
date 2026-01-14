@@ -69,7 +69,7 @@ export default function DisplayScreen() {
                   sm:w-14 sm:h-14
                   md:w-16 md:h-16
                   lg:w-18 lg:h-18
-                  ${isActive ? "bg-blue-600 text-white" : "bg-white text-black"}
+                  ${isActive ? "bg-[#00A6D9] text-white" : "bg-white text-black"}
                 `}
                 style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
               >
