@@ -41,6 +41,13 @@ Le projet est conçu pour supporter **plusieurs centaines d’utilisateurs simul
 - **Node.js ≥ 20**
 - **npm ≥ 9**
 
-```bash
-node -v
-npm -v
+---
+
+### Installation 
+- git clone https://github.com/your-username/humanthings-bingo.git
+- cd humanthings-bingo/cagnotte
+- npm install
+
+### Lancement 
+- cd Cagnotte (front) : npm run dev
+- cd CagnotteBack : node server.js
