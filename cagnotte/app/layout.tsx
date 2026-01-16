@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Human Things Events",
+  title: "Cagnotte Bingo en Or",
   description: "Cagnotte Bingo en Or",
 };
 

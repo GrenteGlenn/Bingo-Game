@@ -39,14 +39,14 @@ export default function DisplayScreen() {
 
       {/* NUMÉROS */}
       <div className="absolute inset-0 flex left-80 items-center justify-center px-24">
-        <div className="flex flex-col border border-white rounded-lg px-6 md:px-0 py-2 w-full max-w-8xl bg-transparent">
+        <div className="flex flex-col border border-white rounded-lg px-6 md:px-0 py-1 w-full max-w-8xl bg-transparent -mt-24 md:-mt-24 lg:-mt-0">
           <div
             className="
               grid
               grid-cols-
               sm:grid-cols-6
               md:grid-cols-8
-              lg:grid-cols-9
+              lg:grid-cols-11
               gap-4 md:gap-5
               justify-items-center
             "
@@ -65,7 +65,7 @@ export default function DisplayScreen() {
                     sm:w-14 sm:h-14
                     md:w-16 md:h-16
                     lg:w-18 lg:h-18
-                    text-xl md:text-6xl
+                    text-xl md:text-5xl
                     ${
                       isActive
                         ? "bg-[#00A6D9] text-white"
