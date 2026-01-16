@@ -34,7 +34,7 @@ export default function ControlPanel() {
     <div className="w-full max-w-5xl mx-auto p-4 md:p-6">
       <h2 className="text-xl md:text-2xl font-semibold">Panel Cagnotte</h2>
 
-      {/* 🎯 PALIERS */}
+      {/* PALIERS */}
       <div className="grid gap-4 grid-cols-2 md:grid-cols-4 p-6">
         <button
           onClick={() => sendPalier(1)}
@@ -68,7 +68,7 @@ export default function ControlPanel() {
         </button>
       </div>
 
-      {/* 🔢 NUMÉROS */}
+      {/* NUMÉROS */}
       <div className="flex flex-col gap-4 md:gap-6">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <h2 className="text-xl md:text-2xl font-semibold">

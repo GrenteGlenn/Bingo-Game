@@ -132,13 +132,6 @@ function emitPlayerState(socket, token) {
 
 /* ---------- SOCKET ---------- */
 io.on("connection", (socket) => {
-  // const token = socket.handshake.auth?.token;
-
-  // if (token) {
-  //   // ✅ CRÉATION OU RÉCUPÉRATION DU JOUEUR
-  //   emitPlayerState(socket, token);
-  //   scheduleSave();
-  // }
 
   socket.emit("show-action", {
     type: "cagnotte-update",
@@ -151,24 +144,13 @@ io.on("connection", (socket) => {
   });
 
   socket.on("show-action", (msg) => {
-    // if (msg.type === "toggle-cell") {
-    //   const { token, row, col } = msg;
-    //   const p = getPlayer(token);
-    //   const key = `${row}-${col}`;
-
-    //   p.selected.has(key) ? p.selected.delete(key) : p.selected.add(key);
-
-    //   emitPlayerState(socket, token);
-    //   scheduleSave();
-    //   return;
-    // }
-
+ 
     if (msg.type === "toggle-cell") {
       const { token, row, col } = msg;
       const p = getPlayer(token);
       const key = `${row}-${col}`;
 
-      // 🔢 +12 / -12 points par case
+      // +12 / -12 points par case
       if (p.selected.has(key)) {
         p.selected.delete(key);
         cagnottePoints -= 12;
@@ -177,16 +159,16 @@ io.on("connection", (socket) => {
         cagnottePoints += 12;
       }
 
-      // 🎯 lignes complétées
+      // lignes complétées
       const newLines = countCompletedLines(p.selected);
       const diff = newLines - p.completedLines;
 
       if (diff !== 0) {
-        cagnottePoints += diff * 30; // +30 par ligne
+        cagnottePoints += diff * 30;
         p.completedLines = newLines;
       }
 
-      // 🏆 grille complète
+      // grille complète
       const isFull = p.selected.size === 25;
       if (isFull && !p.isFull) {
         cagnottePoints += 100;
@@ -197,7 +179,7 @@ io.on("connection", (socket) => {
         p.isFull = false;
       }
 
-      // 🔥 EMISSIONS LIVE
+      // EMISSIONS LIVE
       emitPlayerState(socket, token);
 
       io.emit("show-action", {
@@ -228,27 +210,13 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // if (msg.type === "reset-bingo") {
-    //   players.clear();
-
-    //   // ⚠️ recrée les grilles pour TOUS les sockets connectés
-    //   for (const s of io.sockets.sockets.values()) {
-    //     const t = s.handshake.auth?.token;
-    //     if (t) emitPlayerState(s, t);
-    //   }
-
-    //   io.emit("show-action", { type: "reset-bingo" });
-    //   scheduleSave();
-    //   return;
-    // }
-
     if (msg.type === "reset-bingo") {
       players.clear();
 
-      // 1️⃣ informer tout le monde du reset
+      // informer tout le monde du reset
       io.emit("show-action", { type: "reset-bingo" });
 
-      // 2️⃣ NE PAS recréer les grilles ici
+      // NE PAS recréer les grilles ici
       // elles seront recréées à la demande client
 
       scheduleSave();

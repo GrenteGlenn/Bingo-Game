@@ -22,7 +22,7 @@ export default function DisplayScreen() {
 
   return (
     <div className="relative w-full min-h-screen px-6">
-      {/* 🔝 LOGO – haut centré */}
+      {/* LOGO */}
        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-full flex justify-center">
        <img
           src="/images/BINGOENOR.png"
@@ -37,7 +37,7 @@ export default function DisplayScreen() {
         />
       </div>
 
-      {/* 🎯 NUMÉROS – centre écran */}
+      {/* NUMÉROS */}
       <div className="absolute inset-0 flex left-80 items-center justify-center px-24">
         <div className="flex flex-col border border-white rounded-lg px-6 md:px-0 py-2 w-full max-w-8xl bg-transparent">
           <div
@@ -82,7 +82,7 @@ export default function DisplayScreen() {
         </div>
       </div>
 
-      {/* 📍 QR CODE – bas droite */}
+      {/* QR CODE */}
       <div className="absolute top-20 left-4">
         <img
           src="/images/qrcode.png"

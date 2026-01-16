@@ -1,4 +1,3 @@
-// components/ConfettiSideCannons.tsx
 "use client";
 
 import { useEffect } from "react";

@@ -61,7 +61,7 @@ export default function CagnotteTube() {
     const tube = new THREE.Mesh(tubeGeo, tubeMat);
     cagnotteGroup.add(tube);
 
-    // ✨ Anneaux lumineux dans le tube
+    // Anneaux lumineux dans le tube
     const ringYs = [-1.2, -0.6, 0, 0.6, 1.2];
 
     const ringMaterial = new THREE.MeshStandardMaterial({
