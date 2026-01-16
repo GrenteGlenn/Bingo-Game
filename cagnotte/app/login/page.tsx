@@ -100,15 +100,8 @@ export default function Page() {
       whitespace-nowrap
     "
         >
-          VOEUX WINDOW 2026
+          VOEUX 2026
         </div>
-
-      
-        <img
-          src="/images/RTE.png"
-          alt="RTE"
-          className="h-50 md:h-72 lg:h-70 opacity-90"
-        />
       </div>
     </div>
   );

@@ -38,13 +38,6 @@ export default function bingo() {
         <span className="font-semibold mt-0.5 text-white">{playerName}</span>
       </div>
       <CellBingo />
-      <div className="h-1/2">
-        <img
-          src="/images/RTE.png"
-          alt="RTE"
-          className="h-full md:h-80 lg:h-80 opacity-90"
-        />
-      </div>
     </div>
   );
 }
