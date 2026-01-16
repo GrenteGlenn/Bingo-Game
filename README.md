@@ -7,6 +7,15 @@ Le projet est conçu pour supporter **plusieurs centaines d’utilisateurs simul
 
 ---
 
+## 🔗 Accès rapides
+
+[![Cagnotte](https://img.shields.io/badge/🎯-Cagnotte-blue)](https://cagnotte-bingo-production.up.railway.app/cagnotte)
+[![Affichage](https://img.shields.io/badge/📺-Affichage-green)](https://cagnotte-bingo-production.up.railway.app/affichage)
+[![Login](https://img.shields.io/badge/🔐-Login-orange)](https://cagnotte-bingo-production.up.railway.app/login)
+[![Panel](https://img.shields.io/badge/⚙️-Panel-red)](https://cagnotte-bingo-production.up.railway.app/panel)
+
+---
+
 ## 🚀 Fonctionnalités
 
 - 🎰 Jeu de bingo interactif en temps réel
