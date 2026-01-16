@@ -75,7 +75,7 @@ if (fs.existsSync(STATE_FILE)) {
       });
     });
   } catch (e) {
-    console.error("❌ load error", e);
+    console.error(" load error", e);
   }
 }
 
@@ -242,5 +242,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(process.env.PORT || 4000, () =>
-  console.log("🚀 Socket.IO running")
+  console.log(" Socket.IO running")
 );
